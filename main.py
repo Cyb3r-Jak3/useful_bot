@@ -1,5 +1,6 @@
 import praw, os, re
 from botinfo import Start
+from praw.models import MoreComments
 
 
 if not os.path.isfile("posts_replied_to.txt"): #Checks to see if there is a file
@@ -22,39 +23,49 @@ else:
 
 reddit = Start()
 subreddit =  reddit.subreddit("usefulbottest")
-print(comments_replied_to)
-print(posts_replied_to)
+#print(comments_replied_to)
+#print(posts_replied_to)
 
-for submission in subreddit.hot(limit=5): #gets submissions from the subreddit. Here it has a limit of 5
+for submission in subreddit.hot(limit=10): #gets submissions from the subreddit. Here it has a limit of 5
 	if submission.id not in posts_replied_to:
 		if  re.search("skills", submission.title, re.IGNORECASE):
 			posts_replied_to.append(submission.id)
 			submission.reply("Usebot says that it worked")
 			print("Bot replying to : ", submission.title)
-			
-with open("posts_replied_to.txt", "w") as f:
+			break
+#print("Finished with the submission replies")#Debugging Steps
+with open("posts_replied_to.txt", "w") as f: 
 	for post_id in posts_replied_to:
 		f.write(post_id + "\n")
+#print("Wrote the post_ids") #Debugging Steps
 
-comments = subreddit.stream.comments() #Gets comments that are there
 
 numreplies = 0
-
+debug_num = 0
 
 
 while True:
-	f = open("comments_replied_to", "w")
-	for comment in comments:
-		text = comment.body
-		author = comment.author
-		if re.search("comment", str(text), re.IGNORECASE) and comment.id not in comments_replied_to:
-			comments_replied_to.append(comment.id)
-			f.write(comment_id + "\n")
-			comment.reply ("There is no kidding here %s" % author)
-			print("Bot replying to :", text)
-			break
+	for post in subreddit.hot(limit=10):
+		submission = reddit.submission(post)
+		submission.comments.replace_more(limit=50)
+		for comment in submission.comments.list():
+			print(debug_num)
+			debug_num += 1
+			text = comment.body
+			author = comment.author
+			#print(author, text)
+			if ("kidding" in text.lower()) and comment.id not in comments_replied_to:
+				comments_replied_to.append(comment.id)
+				comment.reply ("There is no kidding here %s" % author)
+				print("Bot replying to :", text)
+				with open("comments_replied_to.txt", "w") as f:
+					for comment_id in comments_replied_to:
+						f.write(comment_id + "\n")
+				break
 
-print("complted")
+
+#print("Finished with replying to comments")#Debugging Steps
 with open("comments_replied_to.txt", "w") as f:
 	for comment_id in comments_replied_to:
 		f.write(comment_id + "\n")
+print("end of script")
