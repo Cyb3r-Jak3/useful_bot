@@ -99,3 +99,11 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+#keeps the bot info private
+botinfo.py
+
+#keeps the project out of repo
+
+.sublime-project
+.sublime-workspace
