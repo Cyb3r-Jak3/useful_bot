@@ -7,5 +7,5 @@ Currently:
 * Replies to posts  
   
 Issues:  
-* It replies to comments that it makes
+* ~~It replies to comments that it makes~~
 
