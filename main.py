@@ -23,8 +23,6 @@ else:
 
 reddit = Start()
 subreddit =  reddit.subreddit("usefulbottest")
-#print(comments_replied_to)
-#print(posts_replied_to)
 
 for submission in subreddit.hot(limit=10): #gets submissions from the subreddit. Here it has a limit of 5
 	if submission.id not in posts_replied_to:
@@ -40,31 +38,24 @@ with open("posts_replied_to.txt", "w") as f:
 #print("Wrote the post_ids") #Debugging Steps
 
 
-numreplies = 0
-debug_num = 0
 
 
-while True:
-	print ("There are ", (len(list(subreddit.hot(limit=10))), "posts"))
-	for post in subreddit.hot(limit=10):
-		submission = reddit.submission(post)
-		submission.comments.replace_more(limit=50)
-		print("Commnt list is", str(len(submission.comments.list())))
-		for comment in submission.comments.list():
-			print(debug_num)
-			debug_num += 1
-			text = comment.body
-			author = comment.author
-			#print(author, text)
-			if ("kidding" in text.lower()) and (comment.id not in comments_replied_to) and (author != "usefulbot") :
-				comments_replied_to.append(comment.id)
-				comment.reply ("There is no kidding here %s" % author)
-				print("Bot replying to :", text)
-				with open("comments_replied_to.txt", "w") as f:
-					for comment_id in comments_replied_to:
-						f.write(comment_id + "\n")
-				break
 
+print ("There are ", (len(list(subreddit.hot(limit=10))), "posts"))
+for post in subreddit.hot(limit=10):
+	submission = reddit.submission(post)
+	submission.comments.replace_more(limit=50)
+	print("Comment list is", str(len(submission.comments.list())))
+	for comment in submission.comments.list():
+		text = comment.body
+		author = comment.author
+		# print(author, text)
+		if ("kidding" in text.lower()) and (comment.id not in comments_replied_to) and (author != "useful_bot") :
+			comments_replied_to.append(comment.id)
+			comment.reply ("There is no kidding here %s" % author)
+			print("Bot replying to :", text)
+			break
+ 
 
 #print("Finished with replying to comments")#Debugging Steps
 with open("comments_replied_to.txt", "w") as f:
