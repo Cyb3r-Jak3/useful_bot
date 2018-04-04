@@ -103,6 +103,8 @@ ENV/
 #keeps the bot info private
 botinfo.py
 
+bot.log
+
 #keeps the project out of repo
 
 .sublime-project
