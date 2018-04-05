@@ -1,40 +1,52 @@
-import sqlite3
+import sqlite3, string
 
-connection = sqlite3.connect("comments.db")
+import logmaker
+connection = sqlite3.connect("data.db")
 
 cursor = connection.cursor()
 
 
 def create():
-    cursor.execute("""
-CREATE TABLE IF NOT EXISTS Comments ( 
-id char(11) NOT NULL DEFAULT '',
-time timestamp NOT NULL,
+
+    command = """
+CREATE TABLE IF NOT EXISTS Posts ( 
+id text NOT NULL DEFAULT '',
+time text NOT NULL,
 subreddit text,
 reply text,
-PRIMARY KEY (id)); """)
-    cursor.execute("""
-CREATE TABLE IF NOT EXISTS Posts ( 
-id char(11) NOT NULL DEFAULT '',
-time timestamp NOT NULL,
-subreddit text,
-reply text
 PRIMARY KEY (id)
-);""")
+);"""
+    cursor.execute(command)
+    command = """
+CREATE TABLE IF NOT EXISTS Comments ( 
+id text NOT NULL DEFAULT '',
+time text NOT NULL,
+subreddit text,
+reply text,
+PRIMARY KEY (id)); """
+    cursor.execute(command)
 
 
 def datainsert(choice, data):
-    print(choice, "\n")
-    print(data)
+    logger = logmaker.makeLogger("Data")
     for i in data:
-        format_str = """ INSERT INTO {choice} (id, time, subreddit, reply) VALUES ({id}, {time}, {subreddit}, {reply}""".format(
-            choice=choice, id=i[0], time=i[1], subreddit=i[2], reply=i[3])
-        print(format_str)
-        #cursor.execute(format_str)
-        #connection.commit()
+        # logger.debug(choice, str(data))
+        format_str = """ INSERT OR IGNORE INTO {choice} (id, time, subreddit, reply) VALUES (?, ?, ?, ?)""".format(
+            choice=choice)
+        #logger.debug(format_str)
+        try:
+            cursor.execute(format_str, (i[0], i[1], i[2], i[3]))
+            connection.commit()
+        except Exception as e:
+            logger.error(e)
+
+
 
 
 def datafecter(Table):
     cursor.execute("SELECT id FROM {table}".format(table=Table))
-    result = cursor.fetchall()
-    return list(result)
+    result = list(cursor.fetchall())
+    result = "['%s']" % "', '".join([t[0] for t in result])
+    return (result)
+
+create()

@@ -2,8 +2,7 @@ import logging
 
 
 def makeLogger(Name):
-    loggerName = Name
-    logger = logging.getLogger(loggerName)
+    logger = logging.getLogger(Name)
     logger.setLevel(logging.DEBUG)
     logFile = "bot.log"
     formatter = logging.Formatter('%(levelname)s - %(name)s - %(asctime)s - %(message)s', '%Y-%m-%d %H:%M:%S')

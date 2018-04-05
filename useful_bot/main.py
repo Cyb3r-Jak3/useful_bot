@@ -1,29 +1,30 @@
 # Either default or built in
-import praw, os, re, datetime
+import praw, re, datetime, os, sys
 
 # mine
 import botinfo, logmaker, datahandler
 
-comments_replied_to = datahandler.datafecter("Comments")
 
-posts_replied_to = datahandler.datafecter("Posts")
+def stopbot(Delete):
+    logger.info("Shutting down")
+    if Delete:
+        logger.info("Deleting log file")
+        os.remove("bot.log")
+    sys.exit(0)
 
-"""if not os.path.isfile("posts_replied_to.txt"):  # Checks to see if there is a file
-    posts_replied_to = []
 
-else:  # just goes through the information from the post that have been replied to
-    with open("posts_replied_to.txt", "r") as f:
-        posts_replied_to = f.read()
-        posts_replied_to = posts_replied_to.split("\n")
-        posts_replied_to = list(filter(None, posts_replied_to))
-
-if not os.path.isfile("comments_replied_to.txt"):  # again checks to if there a file there
-    comments_replied_to = []
-else:
-    with open("comments_replied_to.txt", "r") as f:  # reads the file
-        comments_replied_to = f.read()
-        comments_replied_to = comments_replied_to.split("\n")
-        comments_replied_to = list(filter(None, comments_replied_to))"""
+def getprevious():
+    try:
+        comments = datahandler.datafecter("Comments")
+    except Exception as e:
+        logger.error("Error getting comment ids " + str(e))
+        stopbot(False)
+    try:
+        posts = datahandler.datafecter("Posts")
+    except Exception as e:
+        logger.error("Error getting post ids " + str(e))
+        stopbot(False)
+    return comments, posts
 
 
 def Start():
@@ -34,9 +35,7 @@ def Start():
         return r
     except Exception as e:
         logger.error("Exception {} occurred on login".format(e))
-
-
-
+        stopbot(False)
 
 
 def postReply(subreddit):
@@ -49,14 +48,13 @@ def postReply(subreddit):
             if re.search("skills", submission.title, re.IGNORECASE):
                 add.append(submission.id)
                 submission.reply(post_reply)
-                add.append(datetime.datetime.now().strftime('%Y-%m-$d %H:%M:%S'))
+                add.append(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
                 logger.debug("Bot replying to : {0}".format(submission.title))
                 add.append(subreddit_choice)
                 add.append(post_reply)
                 toadd.append(add)
                 break
 
-    #print(toadd)
     logger.debug("Replied to posts")
     datahandler.datainsert("Posts", toadd)
     logger.debug("Finished with posts")
@@ -65,7 +63,6 @@ def postReply(subreddit):
 def commentReply(subreddit):
     logger.debug("Replying to comments")
     toadd = []
-
     for post in subreddit.hot(limit=10):
         submission = reddit.submission(post)
         submission.comments.replace_more(limit=50)
@@ -76,7 +73,7 @@ def commentReply(subreddit):
             if ("kidding" in text.lower()) and (comment.id not in comments_replied_to) and (author != "useful_bot"):
                 add.append(comment.id)
                 comment_reply = "There is no kidding here {0}".format(author)
-                add.append(datetime.datetime.now().strftime('%Y-%m-$d $H:%M:%S'))
+                add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
                 comment.reply(comment_reply)
                 logger.debug("Bot replying to {0}".format(text))
                 add.append(comment_reply)
@@ -89,15 +86,19 @@ def commentReply(subreddit):
     logger.debug("Wrote comment ids")
 
 
-logger = logmaker.makeLogger("Main")
-logger.debug("Staring up")
-reddit = Start()
-subreddit_choice = "usefulbottest"
-subreddit = reddit.subreddit(subreddit_choice)
+if __name__ == "__main__":
+    if not os.path.isfile("data.db"):
+        datahandler.create()
 
-
-postReply(subreddit)
-
-commentReply(subreddit)
-
-logger.debug("end of script \n \n")
+    logger = logmaker.makeLogger("Main")
+    logger.debug("Staring up")
+    reddit = Start()
+    subreddit_choice = "usefulbottest"
+    subreddit = reddit.subreddit(subreddit_choice)
+    get = getprevious()
+    posts_replied_to = get[1]
+    comments_replied_to = get[0]
+    postReply(subreddit)
+    commentReply(subreddit)
+    logger.debug("end of script \n \n")
+    stopbot(True)
