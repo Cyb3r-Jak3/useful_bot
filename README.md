@@ -1,11 +1,21 @@
 # Useful bot
 ## coolaspie
 
-A simple reddit bot in python
+A reddit bot in python, using praw.
 
-Currently:  
+---
+
+##### Currently:  
 * Replies to posts  
-  
-Issues:  
-* ~~It replies to comments that it makes~~
 
+---  
+  
+##### Issues:  
+* Does not use the correct values when adding them to the database
+  
+---
+
+##### Possible Future Features:  
+* Reply to messages
+* Be able to blacklist subreddits if contacted
+* Respond to username mentions
