@@ -2,7 +2,9 @@
 import praw, re, datetime, os, sys
 
 # mine
-import botinfo, logmaker, datahandler
+from  logmaker import makeLogger
+from datahandler import *
+from botinfo import *
 
 
 def stopbot(Delete):
@@ -15,12 +17,12 @@ def stopbot(Delete):
 
 def getprevious():
     try:
-        comments = datahandler.datafecter("Comments")
+        comments = datafecter("Comments")
     except Exception as e:
         logger.error("Error getting comment ids " + str(e))
         stopbot(False)
     try:
-        posts = datahandler.datafecter("Posts")
+        posts = datafecter("Posts")
     except Exception as e:
         logger.error("Error getting post ids " + str(e))
         stopbot(False)
@@ -29,8 +31,8 @@ def getprevious():
 
 def Start():
     try:
-        r = praw.Reddit(client_id=botinfo.client_id, client_secret=botinfo.client_secret, password=botinfo.password,
-                        username=botinfo.username, user_agent=botinfo.user_agent)
+        r = praw.Reddit(client_id=client_id, client_secret=client_secret, password=password,
+                        username=username, user_agent=user_agent)
         logger.info("Successfully logged in")
         return r
     except Exception as e:
@@ -56,7 +58,7 @@ def postReply(subreddit):
                 break
 
     logger.debug("Replied to posts")
-    datahandler.datainsert("Posts", toadd)
+    datainsert("Posts", toadd)
     logger.debug("Finished with posts")
 
 
@@ -82,15 +84,15 @@ def commentReply(subreddit):
                 break
 
     logger.debug("Replied to all comments")
-    datahandler.datainsert("Comments", toadd)
+    datainsert("Comments", toadd)
     logger.debug("Wrote comment ids")
 
 
 if __name__ == "__main__":
     if not os.path.isfile("data.db"):
-        datahandler.create()
+        create()
 
-    logger = logmaker.makeLogger("Main")
+    logger = makeLogger("Main")
     logger.debug("Staring up")
     reddit = Start()
     subreddit_choice = "usefulbottest"
