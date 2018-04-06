@@ -1,6 +1,6 @@
-import sqlite3, string
+import sqlite3
 
-import logmaker
+from useful_bot import logmaker
 connection = sqlite3.connect("data.db")
 
 cursor = connection.cursor()
