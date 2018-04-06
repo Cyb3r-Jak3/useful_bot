@@ -2,6 +2,6 @@ language: python
 python:
   - "3.6"
 install:
-  pip3 install praw logging sqlite3
+  pip3 install praw
 script:
   - main.py
