@@ -2,8 +2,7 @@
 import praw, re, datetime, os, sys
 
 # mine
-import botinfo, logmaker, datahandler
-#from useful_bot.botinfo import *
+from useful_bot import datahandler, botinfo, logmaker
 
 def stopbot(Delete):
     logger.info("Shutting down")

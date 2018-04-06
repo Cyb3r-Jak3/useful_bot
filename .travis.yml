@@ -4,4 +4,4 @@ python:
 install:
   pip3 install praw
 script:
-  - python3.6 useful_bot/main.py
+  - python3.6 main.py
