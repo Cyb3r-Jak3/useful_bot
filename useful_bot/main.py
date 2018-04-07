@@ -1,5 +1,6 @@
 # Either default or built in
 import praw, re, datetime, os, sys
+from praw.models import Comment
 
 # mine
 from useful_bot import datahandler, botinfo, logmaker
@@ -14,16 +15,22 @@ def stopbot(Delete):
 
 def getprevious():
     try:
-        comments = datahandler.datafecter("Comments")
+        comments = datahandler.datafecter("Comments", "id")
     except Exception as e:
         logger.error("Error getting comment ids " + str(e))
         stopbot(False)
     try:
-        posts = datahandler.datafecter("Posts")
+        posts = datahandler.datafecter("Posts", "id")
     except Exception as e:
         logger.error("Error getting post ids " + str(e))
         stopbot(False)
-    return comments, posts
+    try:
+        blacklist = [datahandler.datafecter("Blacklist", "user")]
+        blacklist.append("useful_bot")
+    except Exception as e:
+        logger.error("Error getting blacklisted users")
+
+    return comments, posts, blacklist
 
 
 def Start():
@@ -44,10 +51,10 @@ def postReply(subreddit):
     for submission in subreddit.hot(limit=10): # gets submissions from the subreddit. Here it has a limit of 10
         add = []
         if submission.id not in posts_replied_to:
-            if re.search("skills", submission.title, re.IGNORECASE):
+            if (re.search("skills", submission.title, re.IGNORECASE)) and (submission.author not in blacklisted):
                 add.append(submission.id)
                 submission.reply(post_reply)
-                add.append(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
+                add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
                 logger.debug("Bot replying to : {0}".format(submission.title))
                 add.append(subreddit_choice)
                 add.append(post_reply)
@@ -69,7 +76,8 @@ def commentReply(subreddit):
             add = []
             text = comment.body
             author = comment.author
-            if ("kidding" in text.lower()) and (comment.id not in comments_replied_to) and (author != "useful_bot"):
+            if ("kidding" in text.lower()) and (comment.id not in comments_replied_to) and \
+                    (str(author) not in blacklisted):
                 add.append(comment.id)
                 comment_reply = "There is no kidding here {0}".format(author)
                 add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
@@ -85,19 +93,24 @@ def commentReply(subreddit):
     logger.debug("Wrote comment ids")
 
 
+def messageReply():
+    for x in reddit.inbox.unread(mark_read=True):
+        if ("stop" in x.subject.lower()) or ("blacklist" in x.subject.lower()):
+            data = [[str(x.author), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), x.body]]
+            logger.info("Blacklisting user: " + str(x.author))
+            datahandler.datainsert("Blacklist", data)
+
+
 if __name__ == "__main__":
-    if not os.path.isfile("data.db"):
-        datahandler.create()
+    datahandler.create()
 
     logger = logmaker.makeLogger("Main")
     logger.debug("Staring up")
     reddit = Start()
     subreddit_choice = "usefulbottest"
     subreddit = reddit.subreddit(subreddit_choice)
-    get = getprevious()
-    posts_replied_to = get[1]
-    comments_replied_to = get[0]
+    comments_replied_to, posts_replied_to, blacklisted = getprevious()
     postReply(subreddit)
     commentReply(subreddit)
-    logger.debug("end of script \n \n")
+    messageReply()
     stopbot(True)

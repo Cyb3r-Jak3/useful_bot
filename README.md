@@ -28,7 +28,7 @@ To run:
   
 ---
 
-##### Possible Future Features:
+#####  Future Features for a Release V2:
 - [ ] Reply to messages
-- [ ] Be able to blacklist subreddits if contacted
+- [x] Be able to blacklist subreddits if contacted
 - [ ] Respond to username mentions
