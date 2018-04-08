@@ -25,8 +25,9 @@ def getprevious():
         logger.error("Error getting post ids " + str(e))
         stopbot(False)
     try:
-        blacklist = [datahandler.datafecter("Blacklist", "user")]
-        blacklist.append("useful_bot")
+        blacklist = datahandler.datafecter("Blacklist", "user")
+        blacklist+=(" useful_bot")
+
     except Exception as e:
         logger.error("Error getting blacklisted users")
 
@@ -75,16 +76,15 @@ def commentReply(subreddit):
         for comment in submission.comments.list():
             add = []
             text = comment.body
-            author = comment.author
+            author = comment.author.name
             if ("kidding" in text.lower()) and (comment.id not in comments_replied_to) and \
                     (str(author) not in blacklisted):
                 add.append(comment.id)
                 comment_reply = "There is no kidding here {0}".format(author)
-                add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), comment_reply, subreddit_choice)
                 comment.reply(comment_reply)
                 logger.debug("Bot replying to {0}".format(text))
-                add.append(comment_reply)
-                add.append(subreddit_choice)
+                add.append()
                 toadd.append(add)
                 break
 
@@ -93,17 +93,16 @@ def commentReply(subreddit):
     logger.debug("Wrote comment ids")
 
 
-def messageReply():
+def blacklistCheck():
     for x in reddit.inbox.unread(mark_read=True):
-        if ("stop" in x.subject.lower()) or ("blacklist" in x.subject.lower()):
-            data = [[str(x.author), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), x.body]]
+        if (("stop" in x.subject.lower()) or ("blacklist" in x.subject.lower())) and x.author.name not in blacklisted:
+            data = list([[x.author.name, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), x.body]])
             logger.info("Blacklisting user: " + str(x.author))
             datahandler.datainsert("Blacklist", data)
 
 
 if __name__ == "__main__":
     datahandler.create()
-
     logger = logmaker.makeLogger("Main")
     logger.debug("Staring up")
     reddit = Start()
@@ -112,5 +111,5 @@ if __name__ == "__main__":
     comments_replied_to, posts_replied_to, blacklisted = getprevious()
     postReply(subreddit)
     commentReply(subreddit)
-    messageReply()
+    blacklistCheck()
     stopbot(True)
