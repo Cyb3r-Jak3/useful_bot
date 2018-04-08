@@ -24,11 +24,13 @@ To run:
 ---  
   
 ##### Issues:  
-* No issues currently known. If you find one please submit it in the issues tab
+* Adding to blacklist does not actually stop replies
+
+If you find one please submit it in the issues tab
   
 ---
 
 #####  Future Features for a Release V2:
 - [ ] Reply to messages
-- [x] Be able to blacklist subreddits if contacted
+- [x] Be able to blacklist subreddits if contacted. (The data gets added and pulled from table in the database but it does not actually do anything
 - [ ] Respond to username mentions
