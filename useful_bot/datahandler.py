@@ -1,6 +1,8 @@
+# Either default or built in
 import sqlite3
-
+# Local
 from useful_bot import logmaker
+
 connection = sqlite3.connect("data.db")
 cursor = connection.cursor()
 
@@ -29,12 +31,12 @@ PRIMARY KEY (user));"""]
         cursor.execute(i)
 
 
-def datainsert(Table, data):
-    logger = logmaker.makeLogger("Data")
-    if Table == "Blacklist":
+def data_insert(table, data):
+    logger = logmaker.make_logger("Data")
+    if table == "Blacklist":
         for i in data:
             format_str = """ INSERT OR IGNORE INTO {choice} (user, time, reason) VALUES (?, ?, ?)""".format(
-                choice=Table)
+                choice=table)
             try:
                 cursor.execute(format_str, (i[0], i[1], i[2]))
                 connection.commit()
@@ -43,7 +45,7 @@ def datainsert(Table, data):
     else:
         for i in data:
             format_str = """ INSERT OR IGNORE INTO {choice} (id, time, subreddit, reply) VALUES (?, ?, ?, ?)""".format(
-                choice=Table)
+                choice=table)
             try:
                 cursor.execute(format_str, (i[0], i[1], i[2], i[3]))
                 connection.commit()
@@ -51,15 +53,14 @@ def datainsert(Table, data):
                 logger.error(e)
 
 
-def datafecter(Table, ident):
-    cursor.execute("SELECT {ident} FROM {table}".format(table=Table, ident=ident))
+def data_fetch(table, ident):
+    cursor.execute("SELECT {ident} FROM {table}".format(table=table, ident=ident))
     result = list(cursor.fetchall())
     result = "['%s']" % "', '".join([t[0] for t in result])
     return result
 
-def datadelete(table, choice, ident):
+
+def data_delete(table, choice, ident):
     command = ("DELETE FROM {table} WHERE {choice}={ident}".format(table=table, choice=choice, ident=ident))
     cursor.execute(command)
     connection.commit()
-
-create()

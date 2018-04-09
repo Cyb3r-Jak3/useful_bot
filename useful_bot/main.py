@@ -1,13 +1,12 @@
 # Either default or built in
 import praw, re, datetime, os, sys
-from praw.models import Comment
-
-# mine
+# Local
 from useful_bot import datahandler, botinfo, logmaker
 
-def stopbot(Delete):
+
+def stopbot(delete):
     logger.info("Shutting down")
-    if Delete:
+    if delete:
         logger.info("Deleting log file")
         os.remove("bot.log")
     sys.exit(0)
@@ -15,26 +14,25 @@ def stopbot(Delete):
 
 def getprevious():
     try:
-        comments = datahandler.datafecter("Comments", "id")
+        comments = datahandler.data_fetch("Comments", "id")
     except Exception as e:
-        logger.error("Error getting comment ids " + str(e))
+        logger.error("Error getting comment ids: " + str(e))
         stopbot(False)
     try:
-        posts = datahandler.datafecter("Posts", "id")
+        posts = datahandler.data_fetch("Posts", "id")
     except Exception as e:
-        logger.error("Error getting post ids " + str(e))
+        logger.error("Error getting post ids: " + str(e))
         stopbot(False)
     try:
-        blacklist = datahandler.datafecter("Blacklist", "user")
-        blacklist+=(" useful_bot")
-
+        blacklist = datahandler.data_fetch("Blacklist", "user")
+        blacklist += " useful_bot"
     except Exception as e:
-        logger.error("Error getting blacklisted users")
-
+        logger.error("Error getting blacklisted users: " + str(e))
+        stopbot(False)
     return comments, posts, blacklist
 
 
-def Start():
+def start():
     try:
         r = praw.Reddit(client_id=botinfo.client_id, client_secret=botinfo.client_secret, password=botinfo.password,
                         username=botinfo.username, user_agent=botinfo.user_agent)
@@ -45,16 +43,16 @@ def Start():
         stopbot(False)
 
 
-def postReply(subreddit):
+def post_reply(subreddit):
     logger.debug("Replying to posts")
     toadd = []
-    post_reply = "Useful_bot says that it worked"
-    for submission in subreddit.hot(limit=10): # gets submissions from the subreddit. Here it has a limit of 10
+    reply = "Useful_bot says that it worked"
+    for submission in subreddit.hot(limit=10):  # Gets submissions from the subreddit. Here it has a limit of 10
         add = []
         if submission.id not in posts_replied_to:
             if (re.search("skills", submission.title, re.IGNORECASE)) and (submission.author not in blacklisted):
                 add.append(submission.id)
-                submission.reply(post_reply)
+                submission.reply(reply)
                 add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
                 logger.debug("Bot replying to : {0}".format(submission.title))
                 add.append(subreddit_choice)
@@ -63,16 +61,16 @@ def postReply(subreddit):
                 break
 
     logger.debug("Replied to posts")
-    datahandler.datainsert("Posts", toadd)
+    datahandler.data_insert("Posts", toadd)
     logger.debug("Finished with posts")
 
 
-def commentReply(subreddit):
+def comment_reply(subreddit):
     logger.debug("Replying to comments")
     toadd = []
-    for post in subreddit.hot(limit=10):
+    for post in subreddit.hot(limit=10):  # Gets the top 10 posts in the subreddit
         submission = reddit.submission(post)
-        submission.comments.replace_more(limit=50)
+        submission.comments.replace_more(limit=50)  # Gets 50 comments from each post
         for comment in submission.comments.list():
             add = []
             text = comment.body
@@ -80,35 +78,33 @@ def commentReply(subreddit):
             if ("kidding" in text.lower()) and (comment.id not in comments_replied_to) and \
                     (str(author) not in blacklisted):
                 add.append(comment.id)
-                comment_reply = "There is no kidding here {0}".format(author)
-                add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), comment_reply, subreddit_choice)
-                comment.reply(comment_reply)
+                reply = "There is no kidding here {0}".format(author)
+                add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), reply, subreddit_choice)
+                comment.reply(reply)
                 logger.debug("Bot replying to {0}".format(text))
-                add.append()
                 toadd.append(add)
-                break
 
     logger.debug("Replied to all comments")
-    datahandler.datainsert("Comments", toadd)
+    datahandler.data_insert("Comments", toadd)
     logger.debug("Wrote comment ids")
 
 
-def blacklistCheck():
+def blacklist_check():
     logger.info("Checking Messages")
     for x in reddit.inbox.unread(mark_read=True):
         if (("stop" in x.subject.lower()) or ("blacklist" in x.subject.lower())) and x.author.name.lower() not in blacklisted:
             data = [[x.author.name.lower(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), x.body]]
             logger.info("Blacklisting user: " + str(x.author))
-            messageReply(x.author.name, "blacklist add")
-            datahandler.datainsert("Blacklist", data)
+            message_send(x.author.name, "blacklist add")
+            datahandler.data_insert("Blacklist", data)
         elif (("resume" in x.subject.lower()) or ("unblacklist" in x.subject.lower())) and x.author.name.lower() in blacklisted:
-            datahandler.datadelete("Blacklist", "user", "\'{user}\'".format(user=x.author.name.lower()))
+            datahandler.data_delete("Blacklist", "user", "\'{user}\'".format(user=x.author.name.lower()))
             logger.info("Unblacklisting " + x.author.name)
-            messageReply(x.author.name, "blacklist remove")
+            message_send(x.author.name, "blacklist remove")
 
 
-def messageReply(user, type):
-    logger.info("Sending {0} message to ".format(type) + user)
+def message_send(user, type):
+    logger.info("Sending {0} message to {1}".format(type, user))
     if type == "blacklist add":
         subject = "Successfully blacklisted"
         message = "Hello {user}," \
@@ -125,13 +121,13 @@ def messageReply(user, type):
 
 if __name__ == "__main__":
     datahandler.create()
-    logger = logmaker.makeLogger("Main")
+    logger = logmaker.make_logger("Main")
     logger.debug("Staring up")
-    reddit = Start()
+    reddit = start()
     subreddit_choice = "usefulbottest"
     subreddit = reddit.subreddit(subreddit_choice)
     comments_replied_to, posts_replied_to, blacklisted = getprevious()
-    postReply(subreddit)
-    commentReply(subreddit)
-    blacklistCheck()
+    post_reply(subreddit)
+    comment_reply(subreddit)
+    blacklist_check()
     stopbot(True)

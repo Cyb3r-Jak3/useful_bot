@@ -22,7 +22,7 @@ To run:
 ##### Currently:  
 * Replies to posts
 * Replies to comments
-* Reads messages and adds users who request blacklist
+* Reads messages and adds users who request blacklist or remove from blacklist
 
 ---  
   
