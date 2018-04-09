@@ -36,5 +36,5 @@ If you find one please submit it in the issues tab
 #####  Future Features for a Release V2:
 - [ ] Reply to messages
 - [x] Be able to blacklist subreddits if contacted
-  - [ ] Request unblacklisting
+  - [x] Request unblacklisting
 - [ ] Respond to username mentions

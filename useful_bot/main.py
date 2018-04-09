@@ -94,11 +94,33 @@ def commentReply(subreddit):
 
 
 def blacklistCheck():
+    logger.info("Checking Messages")
     for x in reddit.inbox.unread(mark_read=True):
-        if (("stop" in x.subject.lower()) or ("blacklist" in x.subject.lower())) and x.author.name not in blacklisted:
-            data = list([[x.author.name, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), x.body]])
+        if (("stop" in x.subject.lower()) or ("blacklist" in x.subject.lower())) and x.author.name.lower() not in blacklisted:
+            data = [[x.author.name.lower(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), x.body]]
             logger.info("Blacklisting user: " + str(x.author))
+            messageReply(x.author.name, "blacklist add")
             datahandler.datainsert("Blacklist", data)
+        elif (("resume" in x.subject.lower()) or ("unblacklist" in x.subject.lower())) and x.author.name.lower() in blacklisted:
+            datahandler.datadelete("Blacklist", "user", "\'{user}\'".format(user=x.author.name.lower()))
+            logger.info("Unblacklisting " + x.author.name)
+            messageReply(x.author.name, "blacklist remove")
+
+
+def messageReply(user, type):
+    logger.info("Sending {0} message to ".format(type) + user)
+    if type == "blacklist add":
+        subject = "Successfully blacklisted"
+        message = "Hello {user}," \
+                  "  \n This is a message confirming that you have been added to /u/useful_bot's blacklist.  \n" \
+                  " If you still receive replies for me please send me a message. ".format(user=user)
+    if type == "blacklist remove":
+        subject = "Successfully removed from blacklist"
+        message = ("Hello {user},  \n "
+                   "This message is confirming that you have been removed from /u/useful_bot's blacklist.  \n "
+                   "If you feel that this message was a mistake or you would like to remain on the blacklist then "
+                   "reply stop".format(user=user))
+    reddit.redditor(user).message(subject, message)
 
 
 if __name__ == "__main__":
