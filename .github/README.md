@@ -19,23 +19,23 @@ To run:
 
 ---
 
-##### Currently:  
+#### Currently:
 * Replies to posts
 * Replies to comments
 * Reads messages and adds users who request blacklist or remove from blacklist
 
----  
-  
-##### Issues:
-* ~~Adding to blacklist does not actually stop replies~~
-* ~~Does not mark previous read messages as such~~
-  * Does not mark mentions are read
-
-If you find one please submit it in the issues tab
-  
 ---
 
-#####  Future Features for a Release V2:
+#### Issues:
+* ~~Adding to blacklist does not actually stop replies~~
+* ~~Does not mark previous read messages as such~~
+  * ~~Does not mark mentions are read~~
+
+If you find one please submit it in the issues tab
+
+---
+
+####  Future Features for a Release V2:
 - [ ] Reply to messages
 - [x] Be able to blacklist subreddits if contacted
   - [x] Request unblacklisting
