@@ -26,7 +26,11 @@ CREATE TABLE IF NOT EXISTS Blacklist (
 user text NOT NULL DEFAULT '',
 time text,
 reason NULL,
-PRIMARY KEY (user));"""]
+PRIMARY KEY (user));""", """
+CREATE TABLE IF NOT EXISTS replied_mentions (
+id text NOT NULL DEFAULT '',
+time text,
+PRIMARY KEY (id));"""]
     for i in commands:
         cursor.execute(i)
 
@@ -39,6 +43,14 @@ def data_insert(table, data):
                 choice=table)
             try:
                 cursor.execute(format_str, (i[0], i[1], i[2]))
+                connection.commit()
+            except Exception as e:
+                logger.error(e)
+    elif table == "replied_mentions":
+        for i in data:
+            format_str = """ INSERT OR IGNORE INTO {choice} (id, time) VALUES (?, ?)""".format(choice=table)
+            try:
+                cursor.execute(format_str, (i[0], i[1]))
                 connection.commit()
             except Exception as e:
                 logger.error(e)

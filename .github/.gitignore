@@ -36,5 +36,4 @@ ENV/
 
 #keeps the bot info private
 botinfo.py
-
 bot.log

@@ -29,7 +29,12 @@ def getprevious():
     except Exception as e:
         logger.error("Error getting blacklisted users: " + str(e))
         stopbot(False)
-    return comments, posts, blacklist
+    try:
+        mentions = datahandler.data_fetch("replied_mentions", "id")
+    except Exception as e:
+        logger.error("Error getting mentions: " + str(e))
+        stopbot(False)
+    return comments, posts, blacklist, mentions
 
 
 def start():
@@ -91,16 +96,23 @@ def comment_reply(subreddit):
 
 def blacklist_check():
     logger.info("Checking Messages")
-    for x in reddit.inbox.unread(mark_read=True):
-        if (("stop" in x.subject.lower()) or ("blacklist" in x.subject.lower())) and x.author.name.lower() not in blacklisted:
-            data = [[x.author.name.lower(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), x.body]]
-            logger.info("Blacklisting user: " + str(x.author))
+    marked = []
+    for x in reddit.inbox.unread():
+        subject = x.subject.lower()
+        name = x.author.name.lower()
+        if (("stop" == subject) or ("blacklist" == subject)) \
+                and name not in blacklisted:
+            data = [[name, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), x.body]]
+            logger.info("Blacklisting user: " + x.author.name)
             message_send(x.author.name, "blacklist add")
             datahandler.data_insert("Blacklist", data)
-        elif (("resume" in x.subject.lower()) or ("unblacklist" in x.subject.lower())) and x.author.name.lower() in blacklisted:
-            datahandler.data_delete("Blacklist", "user", "\'{user}\'".format(user=x.author.name.lower()))
+            marked.append(x)
+        elif (("resume" == subject) or ("unblacklist" == subject)) and name in blacklisted:
+            datahandler.data_delete("Blacklist", "user", "\'{user}\'".format(user=name))
             logger.info("Unblacklisting " + x.author.name)
             message_send(x.author.name, "blacklist remove")
+            marked.append(x)
+    reddit.inbox.mark_read(marked)
 
 
 def message_send(user, type):
@@ -119,6 +131,17 @@ def message_send(user, type):
     reddit.redditor(user).message(subject, message)
 
 
+def find_mentions():
+    toadd = []
+    for x in reddit.inbox.mentions():
+        if str(x) not in mentions:
+            logger.info("Found mention {id}. User {user} Body {body}".format(id=x, user=x.author, body=x.body))
+            x.reply("Hello, I see you mentioned me. How can I help?")
+            marked = [x.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
+            toadd.append(marked)
+    datahandler.data_insert("replied_mentions", toadd)
+
+
 if __name__ == "__main__":
     datahandler.create()
     logger = logmaker.make_logger("Main")
@@ -126,8 +149,10 @@ if __name__ == "__main__":
     reddit = start()
     subreddit_choice = "usefulbottest"
     subreddit = reddit.subreddit(subreddit_choice)
-    comments_replied_to, posts_replied_to, blacklisted = getprevious()
+    comments_replied_to, posts_replied_to, blacklisted, mentions = getprevious()
+    print(mentions)
     post_reply(subreddit)
     comment_reply(subreddit)
     blacklist_check()
+    find_mentions()
     stopbot(True)
