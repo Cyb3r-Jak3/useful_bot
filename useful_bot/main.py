@@ -1,7 +1,7 @@
 # Either default or built in
 import praw, re, datetime, os, sys
 # Local
-from useful_bot import datahandler, botinfo, logmaker
+import datahandler, logmaker, botinfo
 
 
 def stopbot(delete):
@@ -55,7 +55,7 @@ def post_reply(subreddit):
     for submission in subreddit.hot(limit=10):  # Gets submissions from the subreddit. Here it has a limit of 10
         add = []
         if submission.id not in posts_replied_to:
-            if (re.search("skills", submission.title, re.IGNORECASE)) and (submission.author not in blacklisted):
+            if (re.search("skills", submission.title, re.IGNORECASE)) and (submission.author.name not in blacklisted):
                 add.append(submission.id)
                 submission.reply(reply)
                 add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
@@ -84,7 +84,9 @@ def comment_reply(subreddit):
                     (str(author) not in blacklisted):
                 add.append(comment.id)
                 reply = "There is no kidding here {0}".format(author)
-                add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), reply, subreddit_choice)
+                add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                add.append(reply)
+                add.append(subreddit_choice)
                 comment.reply(reply)
                 logger.debug("Bot replying to {0}".format(text))
                 toadd.append(add)
@@ -114,7 +116,8 @@ def blacklist_check():
             marked.append(x)
         else:
             logger.info("Message with subject and body not understood. Subject: {0}   Body: {1}".format(x.subject, x.body))
-
+            message_send(x.author.name, "unknown")
+            marked.append(x)
     reddit.inbox.mark_read(marked)
 
 
@@ -128,14 +131,14 @@ def message_send(user, type):
     if type == "blacklist remove":
         subject = "Successfully removed from blacklist"
         message = "Hello {user},  \n " \
-                   "This message is confirming that you have been removed from /u/useful_bot's blacklist.  \n " \
-                   "If you feel that this message was a mistake or you would like to remain on the blacklist then " \
-                   "reply stop".format(user=user)
+                  "This message is confirming that you have been removed from /u/useful_bot's blacklist.  \n " \
+                  "If you feel that this message was a mistake or you would like to remain on the blacklist then " \
+                  "reply stop".format(user=user)
     if type == "unknown":
         subject = "Message Unknown"
         message = "Hello {user},  \n" \
                   "This message is being sent to you because you have sent me a message that I am unsure how to deal with it.  \n " \
-                  "Rest assure this has been recorded and a solution should be in progress. Thanks "
+                  "Rest assure this has been recorded and a solution should be in progress. Thanks ".format(user=user)
     reddit.redditor(user).message(subject, message)
 
 
@@ -158,8 +161,8 @@ if __name__ == "__main__":
     subreddit_choice = "usefulbottest"
     subreddit = reddit.subreddit(subreddit_choice)
     comments_replied_to, posts_replied_to, blacklisted, mentions = getprevious()
+    blacklist_check()
     post_reply(subreddit)
     comment_reply(subreddit)
-    blacklist_check()
     find_mentions()
     stopbot(True)

@@ -1,7 +1,7 @@
 # Either default or built in
 import sqlite3
 # Local
-from useful_bot import logmaker
+import logmaker
 
 connection = sqlite3.connect("data.db")
 cursor = connection.cursor()
@@ -59,7 +59,7 @@ def data_insert(table, data):
             format_str = """ INSERT OR IGNORE INTO {choice} (id, time, subreddit, reply) VALUES (?, ?, ?, ?)""".format(
                 choice=table)
             try:
-                cursor.execute(format_str, (i[0], i[1], i[2], i[3]))
+                cursor.execute(format_str, (i[0], i[1], i[2], str(i[3])))
                 connection.commit()
             except Exception as e:
                 logger.error(e)
