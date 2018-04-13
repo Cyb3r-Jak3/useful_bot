@@ -7,6 +7,8 @@ A reddit bot in python, using praw.
 
 End goal of this project is to have an easy to use reddit bot template
 
+Nice CLI written by [samuellando](https://github.com/samuellando "Author")
+
 ---
 
 ### To use:
