@@ -34,21 +34,26 @@ class CommandLineInterface():
             loop = True
             delay = 0
             if "-" in command:
+                print("Hit control + C to stop looping")
                 delay = int(command.split("-")[1])
             while loop:
-                if "blacklist_check" in command or "all" in command:
-                    main.blacklist_check()
-                if "post_reply" in command or "all" in command:
-                    main.post_reply(subreddit)
-                if "comment_reply" in command or "all" in command:
-                    main.comment_reply(subreddit)
-                if "find_mentions" in command or "all" in command:
-                    main.find_mentions()
-                if command == "exit":
-                    main.stopbot(True)
-                if not "-" in command:
+                try:
+                    if "blacklist_check" in command or "all" in command:
+                        main.blacklist_check()
+                    if "post_reply" in command or "all" in command:
+                        main.post_reply(subreddit)
+                    if "comment_reply" in command or "all" in command:
+                        main.comment_reply(subreddit)
+                    if "find_mentions" in command or "all" in command:
+                        main.find_mentions()
+                    if command == "exit":
+                        main.stopbot(True)
+                    if not "-" in command:
+                        loop = False
+                    time.sleep(delay*60)
+                except KeyboardInterrupt:
+                    print()
                     loop = False
-                time.sleep(delay*60)
 
 
     def startBot(self):
