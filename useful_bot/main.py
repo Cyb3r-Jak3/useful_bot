@@ -153,6 +153,7 @@ def find_mentions():
     datahandler.data_insert("replied_mentions", toadd)
 
 
+
 if __name__ == "__main__":
     datahandler.create()
     logger = logmaker.make_logger("Main")
@@ -170,6 +171,6 @@ if __name__ == "__main__":
         find_mentions()
         # Begin delay.
         logger.debug("Sleeping for {0} minutes\n".format(DELAY))
-        print("Hit control+c to stop the bot.") # This does not need to be logged.S
+        print("Hit control+c to stop the bot.") # This does not need to be logged.
         time.sleep(DELAY*60)
     stopbot(True)

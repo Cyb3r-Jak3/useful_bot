@@ -11,7 +11,7 @@ End goal of this project is to have an easy to use reddit bot template
 
 ### To use:
 The only requirement that you should have to download is praw. All the other modules that are used come with python3.  
-You need to have your own api credentials. If you do not head [here](https://www.reddit.com/prefs/apps "reddit apps") and click create application -> script.  
+You need to have your own api credentials. If you do not head [here](https://www.reddit.com/prefs/apps "reddit apps") and click create application -> script.
 Once you have those credentials add them to botinfo.example.py and rename the file to botinfo.py.  
 To run:  
   `python3 main.py`
@@ -29,6 +29,7 @@ To run:
 * ~~Adding to blacklist does not actually stop replies~~
 * ~~Does not mark previous read messages as such~~
   * ~~Does not mark mentions are read~~
+* ~~[#1](https://github.com/coolaspie/useful_bot/issues/1 "Issue #1") Issue with imports~~
 
 If you find one please submit it in the issues tab
 
@@ -43,5 +44,6 @@ If you find one please submit it in the issues tab
 #### Future Features for Release V3: (Assistance)
 - [ ] Easier template layout.
 - [ ] Easier customization.
-- [ ] Easier addition for functions
+- [ ] Easier to add functions
 - [ ] More execption handling
+- [ ] Make it loop better than currently @samuellando
