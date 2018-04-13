@@ -41,6 +41,7 @@ def start():
     try:
         r = praw.Reddit(client_id=botinfo.client_id, client_secret=botinfo.client_secret, password=botinfo.password,
                         username=botinfo.username, user_agent=botinfo.user_agent)
+        r.user.me() # Verify log in, will raise exception if log in failed.
         logger.info("Successfully logged in")
         return r
     except Exception as e:
