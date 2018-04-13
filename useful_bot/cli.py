@@ -4,18 +4,19 @@ import praw,time
 import datahandler as dh
 import logmaker, main
 
+
 class CommandLineInterface():
     def __init__(self):
         self.logger = logmaker.make_logger("CLI")
-        self.logger.debug("Straring CLI")
+        self.logger.debug("Starting CLI")
         # Connect to db.
         dh.create()
-        # Start praw object useing credentials in data base.
-        self.r = self.startBot()
+        # Start praw object using credentials in data base.
+        self.r = self.start_bot()
         self.run()
 
     def run(self):
-        main.subreddit_choice = self.fetchConfig("subreddit")
+        main.subreddit_choice = self.fetch_config("subreddit")
         main.reddit = self.r
         main.subreddit = main.reddit.subreddit(main.subreddit_choice)
         main.logger = logmaker.make_logger("MAIN")
@@ -49,29 +50,29 @@ class CommandLineInterface():
                         main.find_mentions()
                     if command == "exit":
                         main.stopbot(True)
-                    if not "-" in command:
+                    if "-" not in command:
                         loop = False
                     time.sleep(delay*60)
                 except KeyboardInterrupt:
                     print()
                     loop = False
 
-    def startBot(self):
+    def start_bot(self):
         try:
-            client_id = self.fetchConfig('client_id')
-            client_secret = self.fetchConfig('client_secret')
-            password = self.fetchConfig('password')
-            username = self.fetchConfig('username')
-            user_agent = self.fetchConfig('user_agent')
+            client_id = self.fetch_config('client_id')
+            client_secret = self.fetch_config('client_secret')
+            password = self.fetch_config('password')
+            username = self.fetch_config('username')
+            user_agent = self.fetch_config('user_agent')
             r = praw.Reddit(client_id=client_id, client_secret=client_secret, password=password,
-                        username=username, user_agent=user_agent)
-            r.user.me() # Test authentication.
+                            username=username, user_agent=user_agent)
+            r.user.me()  # Test authentication.
             self.logger.info("Successfully logged in")
             return r
         except Exception as e:
             self.logger.error("Exception {} occurred on login".format(e))
     
-    def fetchConfig(self,find):
+    def fetch_config(self, find):
         try:
             values = dh.data_fetch("configurations","value")
             ids = dh.data_fetch("configurations","id")
