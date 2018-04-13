@@ -1,5 +1,5 @@
-# Either default or built in
-import praw, re, datetime, os, sys
+## Either default or built in
+import praw, re, datetime, os, sys, time
 # Local
 import datahandler, logmaker, botinfo
 
@@ -160,9 +160,16 @@ if __name__ == "__main__":
     reddit = start()
     subreddit_choice = "usefulbottest"
     subreddit = reddit.subreddit(subreddit_choice)
-    comments_replied_to, posts_replied_to, blacklisted, mentions = getprevious()
-    blacklist_check()
-    post_reply(subreddit)
-    comment_reply(subreddit)
-    find_mentions()
+    stop = False # Will run until this is set to true by user.
+    DELAY = 10 # Delay in minutes between runs.
+    while not stop:
+        comments_replied_to, posts_replied_to, blacklisted, mentions = getprevious()
+        blacklist_check()
+        post_reply(subreddit)
+        comment_reply(subreddit)
+        find_mentions()
+        # Begin delay.
+        logger.debug("Sleeping for {0} minutes\n".format(DELAY))
+        print("Hit control+c to stop the bot.") # This does not need to be logged.S
+        time.sleep(DELAY*60)
     stopbot(True)
