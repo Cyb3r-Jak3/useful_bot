@@ -30,7 +30,10 @@ PRIMARY KEY (user));""", """
 CREATE TABLE IF NOT EXISTS replied_mentions (
 id text NOT NULL DEFAULT '',
 time text,
-PRIMARY KEY (id));"""]
+PRIMARY KEY (id));""","""
+CREATE TABLE IF NOT EXISTS configurations (
+id text NOT NULL DEFAULT '',
+value text);"""]
     for i in commands:
         cursor.execute(i)
 
@@ -54,6 +57,15 @@ def data_insert(table, data):
                 connection.commit()
             except Exception as e:
                 logger.error(e)
+    elif table == "configurations":
+        for i in data:
+            format_str = """ INSERT OR IGNORE INTO {choice} (id, value) VALUES (?, ?)""".format(choice=table)
+            try:
+                cursor.execute(format_str, (i[0], i[1]))
+                connection.commit()
+            except Exception as e:
+                logger.error(e)
+
     else:
         for i in data:
             format_str = """ INSERT OR IGNORE INTO {choice} (id, time, subreddit, reply) VALUES (?, ?, ?, ?)""".format(
