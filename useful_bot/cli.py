@@ -17,6 +17,7 @@ class CommandLineInterface():
     def run(self):
         main.subreddit_choice = self.fetchConfig("subreddit")
         main.reddit = self.r
+        main.subreddit = main.reddit.subreddit(main.subreddit_choice)
         main.logger = logmaker.make_logger("MAIN")
         print()
         print("commands:")
@@ -41,9 +42,9 @@ class CommandLineInterface():
                     if "blacklist_check" in command or "all" in command:
                         main.blacklist_check()
                     if "post_reply" in command or "all" in command:
-                        main.post_reply(subreddit)
+                        main.post_reply(main.subreddit)
                     if "comment_reply" in command or "all" in command:
-                        main.comment_reply(subreddit)
+                        main.comment_reply(main.subreddit)
                     if "find_mentions" in command or "all" in command:
                         main.find_mentions()
                     if command == "exit":
@@ -58,25 +59,37 @@ class CommandLineInterface():
 
     def startBot(self):
         try:
-            client_id = self.fetchConfig("client_id")
-            client_secret = self.fetchConfig("client_secret")
-            password = self.fetchConfig("password")
-            username = self.fetchConfig("username")
-            user_agent = self.fetchConfig("user_agent")
+            client_id = self.fetchConfig('client_id')
+            client_secret = self.fetchConfig('client_secret')
+            password = self.fetchConfig('password')
+            username = self.fetchConfig('username')
+            user_agent = self.fetchConfig('user_agent')
             r = praw.Reddit(client_id=client_id, client_secret=client_secret, password=password,
                         username=username, user_agent=user_agent)
             r.user.me() # Test authentication.
-            logger.info("Successfully logged in")
+            self.logger.info("Successfully logged in")
             return r
         except Exception as e:
             self.logger.error("Exception {} occurred on login".format(e))
     
     def fetchConfig(self,find):
         try:
-            return dh.data_fetch("configurations","value")[dh.data_fetch("configurations", "id").index(find)]
+            values = dh.data_fetch("configurations","value")
+            ids = dh.data_fetch("configurations","id")
+            # Convert strings to proper lists
+            values = values.replace("[","")
+            values = values.replace("]","")
+            values = values.replace("'","")
+            values = values.split(", ")
+            ids = ids.replace("[","")
+            ids = ids.replace("]","")
+            ids = ids.replace("'","")
+            ids = ids.split(", ")
+            return values[ids.index(find)]
         except Exception as e:
             value = input("Enter "+find+": ")
             dh.data_insert("configurations",[[find,value]])
             return value
             
-C = CommandLineInterface()
+if __name__ == "__main__":
+    C = CommandLineInterface()
