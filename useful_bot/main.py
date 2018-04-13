@@ -1,5 +1,5 @@
 # Either default or built in
-import praw, re, datetime, os, sys
+import praw, re, datetime, os, sys, time
 # Local
 import datahandler, logmaker, botinfo
 
@@ -153,16 +153,20 @@ def find_mentions():
     datahandler.data_insert("replied_mentions", toadd)
 
 
+
 if __name__ == "__main__":
-    datahandler.create()
-    logger = logmaker.make_logger("Main")
-    logger.debug("Staring up")
-    reddit = start()
-    subreddit_choice = "usefulbottest"
-    subreddit = reddit.subreddit(subreddit_choice)
-    comments_replied_to, posts_replied_to, blacklisted, mentions = getprevious()
-    blacklist_check()
-    post_reply(subreddit)
-    comment_reply(subreddit)
-    find_mentions()
-    stopbot(True)
+    while True:
+        datahandler.create()
+        logger = logmaker.make_logger("Main")
+        logger.debug("Staring up")
+        reddit = start()
+        subreddit_choice = "usefulbottest"
+        subreddit = reddit.subreddit(subreddit_choice)
+        comments_replied_to, posts_replied_to, blacklisted, mentions = getprevious()
+        blacklist_check()
+        post_reply(subreddit)
+        comment_reply(subreddit)
+        find_mentions()
+        # Comment out stopbot to get it to repeat
+        stopbot(True)
+        time.sleep(300)
