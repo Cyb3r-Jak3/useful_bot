@@ -1,4 +1,4 @@
-# Either default or built in
+## Either default or built in
 import praw, re, datetime, os, sys, time
 # Local
 import datahandler, logmaker, botinfo
@@ -156,18 +156,22 @@ def find_mentions():
 
 
 if __name__ == "__main__":
-    while True:
-        datahandler.create()
-        logger = logmaker.make_logger("Main")
-        logger.debug("Staring up")
-        reddit = start()
-        subreddit_choice = "usefulbottest"
-        subreddit = reddit.subreddit(subreddit_choice)
+    datahandler.create()
+    logger = logmaker.make_logger("Main")
+    logger.debug("Staring up")
+    reddit = start()
+    subreddit_choice = "usefulbottest"
+    subreddit = reddit.subreddit(subreddit_choice)
+    stop = False # Will run until this is set to true by user.
+    DELAY = 10 # Delay in minutes between runs.
+    while not stop:
         comments_replied_to, posts_replied_to, blacklisted, mentions = getprevious()
         blacklist_check()
         post_reply(subreddit)
         comment_reply(subreddit)
         find_mentions()
-        # Comment out stopbot to get it to repeat
-        stopbot(True)
-        time.sleep(300)
+        # Begin delay.
+        logger.debug("Sleeping for {0} minutes\n".format(DELAY))
+        print("Hit control+c to stop the bot.") # This does not need to be logged.
+        time.sleep(DELAY*60)
+    stopbot(True)
