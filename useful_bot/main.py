@@ -112,6 +112,9 @@ def blacklist_check():
             logger.info("Unblacklisting " + x.author.name)
             message_send(x.author.name, "blacklist remove")
             marked.append(x)
+        else:
+            logger.info("Message with subject and body not understood. Subject: {0}   Body: {1}".format(x.subject, x.body))
+
     reddit.inbox.mark_read(marked)
 
 
@@ -119,15 +122,20 @@ def message_send(user, type):
     logger.info("Sending {0} message to {1}".format(type, user))
     if type == "blacklist add":
         subject = "Successfully blacklisted"
-        message = "Hello {user}," \
-                  "  \n This is a message confirming that you have been added to /u/useful_bot's blacklist.  \n" \
+        message = "Hello {user},  \n" \
+                  "  This is a message confirming that you have been added to /u/useful_bot's blacklist.  \n" \
                   " If you still receive replies for me please send me a message. ".format(user=user)
     if type == "blacklist remove":
         subject = "Successfully removed from blacklist"
-        message = ("Hello {user},  \n "
-                   "This message is confirming that you have been removed from /u/useful_bot's blacklist.  \n "
-                   "If you feel that this message was a mistake or you would like to remain on the blacklist then "
-                   "reply stop".format(user=user))
+        message = "Hello {user},  \n " \
+                   "This message is confirming that you have been removed from /u/useful_bot's blacklist.  \n " \
+                   "If you feel that this message was a mistake or you would like to remain on the blacklist then " \
+                   "reply stop".format(user=user)
+    if type == "unknown":
+        subject = "Message Unknown"
+        message = "Hello {user},  \n" \
+                  "This message is being sent to you because you have sent me a message that I am unsure how to deal with it.  \n " \
+                  "Rest assure this has been recorded and a solution should be in progress. Thanks "
     reddit.redditor(user).message(subject, message)
 
 
@@ -150,7 +158,6 @@ if __name__ == "__main__":
     subreddit_choice = "usefulbottest"
     subreddit = reddit.subreddit(subreddit_choice)
     comments_replied_to, posts_replied_to, blacklisted, mentions = getprevious()
-    print(mentions)
     post_reply(subreddit)
     comment_reply(subreddit)
     blacklist_check()
