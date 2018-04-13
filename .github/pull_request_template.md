@@ -1,9 +1,10 @@
-Fixes # or improves by addding:  
-- 
-- 
+Fixes # or improves by addding:
+-------------------------------
+-
+-
 
 Changes proposed in this pull request:
-- 
+--------------------------------------
 - 
 - 
 

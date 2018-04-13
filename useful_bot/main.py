@@ -41,7 +41,7 @@ def start():
     try:
         r = praw.Reddit(client_id=botinfo.client_id, client_secret=botinfo.client_secret, password=botinfo.password,
                         username=botinfo.username, user_agent=botinfo.user_agent)
-        r.user.me() # Verify log in, will raise exception if log in failed.
+        r.user.me()  # Verify log in, will raise exception if log in failed.
         logger.info("Successfully logged in")
         return r
     except Exception as e:
@@ -52,17 +52,16 @@ def start():
 def post_reply(subreddit):
     logger.debug("Replying to posts")
     toadd = []
-    reply = "Useful_bot says that it worked"
     for submission in subreddit.hot(limit=10):  # Gets submissions from the subreddit. Here it has a limit of 10
         add = []
         if submission.id not in posts_replied_to:
-            if (re.search("skills", submission.title, re.IGNORECASE)) and (submission.author.name not in blacklisted):
+            if (re.search(botinfo.post_text, submission.title, re.IGNORECASE)) and (submission.author.name not in blacklisted):
                 add.append(submission.id)
-                submission.reply(reply)
+                submission.reply(botinfo.post_reply)
                 add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
                 logger.debug("Bot replying to : {0}".format(submission.title))
-                add.append(subreddit_choice)
-                add.append(post_reply)
+                add.append(botinfo.subreddit)
+                add.append(botinfo.post_reply)
                 toadd.append(add)
                 break
 
@@ -81,14 +80,14 @@ def comment_reply(subreddit):
             add = []
             text = comment.body
             author = comment.author.name
-            if ("kidding" in text.lower()) and (comment.id not in comments_replied_to) and \
+            if (botinfo.comment_text in text.lower()) and (comment.id not in comments_replied_to) and \
                     (str(author) not in blacklisted):
                 add.append(comment.id)
-                reply = "There is no kidding here {0}".format(author)
                 add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                add.append(reply)
-                add.append(subreddit_choice)
-                comment.reply(reply)
+                add.append(botinfo.comment_reply)
+                add.append(botinfo.subreddit)
+                if "{user}" in botinfo.comment_reply:
+                    comment.reply(botinfo.comment_reply.format(user=author))
                 logger.debug("Bot replying to {0}".format(text))
                 toadd.append(add)
 
@@ -154,14 +153,13 @@ def find_mentions():
     datahandler.data_insert("replied_mentions", toadd)
 
 
-
 if __name__ == "__main__":
     datahandler.create()
     logger = logmaker.make_logger("Main")
     logger.debug("Staring up")
     reddit = start()
-    subreddit_choice = "usefulbottest"
-    subreddit = reddit.subreddit(subreddit_choice)
+    subreddit_choice = botinfo.subreddit
+    subreddit = reddit.subreddit(botinfo.subreddit)
     comments_replied_to, posts_replied_to, blacklisted, mentions = getprevious()
     message_check()
     post_reply(subreddit)
