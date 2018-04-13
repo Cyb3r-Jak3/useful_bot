@@ -22,28 +22,21 @@ To run:
 * Replies to posts
 * Replies to comments
 * Reads messages and adds users who request blacklist or remove from blacklist
+* Replies to messages
+* Be able to blacklist subreddits if contacted
+  * Can unblacklist unblacklisting
+*  Respond to username mentions
 
 ---
 
 #### Issues:
-* ~~Adding to blacklist does not actually stop replies~~
-* ~~Does not mark previous read messages as such~~
-  * ~~Does not mark mentions are read~~
-* ~~[#1](https://github.com/coolaspie/useful_bot/issues/1 "Issue #1") Issue with imports~~
 
 If you find one please submit it in the issues tab
 
 ---
-
-#### Features for a Release V2: (Messaging)
-- [x] Reply to messages
-- [x] Be able to blacklist subreddits if contacted
-  - [x] Request unblacklisting
-- [x] Respond to username mentions
 
 #### Future Features for Release V3: (Assistance)
 - [ ] Easier template layout.
 - [ ] Easier customization.
 - [ ] Easier to add functions
 - [ ] More execption handling
-- [ ] Make it loop better than currently @samuellando

@@ -97,7 +97,7 @@ def comment_reply(subreddit):
     logger.debug("Wrote comment ids")
 
 
-def blacklist_check():
+def message_check():
     logger.info("Checking Messages")
     marked = []
     for x in reddit.inbox.unread():
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     subreddit_choice = "usefulbottest"
     subreddit = reddit.subreddit(subreddit_choice)
     comments_replied_to, posts_replied_to, blacklisted, mentions = getprevious()
-    blacklist_check()
+    message_check()
     post_reply(subreddit)
     comment_reply(subreddit)
     find_mentions()

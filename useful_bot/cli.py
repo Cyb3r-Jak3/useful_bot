@@ -1,5 +1,5 @@
 # External
-import praw,os,sys,time
+import praw,time
 # Local
 import datahandler as dh
 import logmaker, main
@@ -21,7 +21,7 @@ class CommandLineInterface():
         main.logger = logmaker.make_logger("MAIN")
         print()
         print("commands:")
-        print("blacklist_check")
+        print("message_check")
         print("post_reply")
         print("comment_reply")
         print("find_mentions")
@@ -39,7 +39,7 @@ class CommandLineInterface():
                 delay = int(command.split("-")[1])
             while loop:
                 try:
-                    if "blacklist_check" in command or "all" in command:
+                    if "message_check" in command or "all" in command:
                         main.blacklist_check()
                     if "post_reply" in command or "all" in command:
                         main.post_reply(main.subreddit)
@@ -55,7 +55,6 @@ class CommandLineInterface():
                 except KeyboardInterrupt:
                     print()
                     loop = False
-
 
     def startBot(self):
         try:
@@ -90,6 +89,7 @@ class CommandLineInterface():
             value = input("Enter "+find+": ")
             dh.data_insert("configurations",[[find,value]])
             return value
-            
+
+
 if __name__ == "__main__":
     C = CommandLineInterface()
