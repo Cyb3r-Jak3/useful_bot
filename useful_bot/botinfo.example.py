@@ -10,4 +10,4 @@ post_text = "What you want the bot to find in the post"
 post_reply = "What you want the bot to comment when it finds the post_text"
 
 # Comment reply format support:
-#   {user} for authors name
+#   {user} for authors name ie Hello {user} prints Hello (author of comment)
