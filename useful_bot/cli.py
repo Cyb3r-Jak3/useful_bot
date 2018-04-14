@@ -16,17 +16,22 @@ class CommandLineInterface():
         self.run()
 
     def run(self):
-        main.subreddit_choice = self.fetch_config("subreddit")
+        try:
+            main.subreddit_choice = self.fetch_config("subreddit")
+        except Exception:
+            main.subreddit_choice = botinfo.subreddit
         main.reddit = self.r
         main.subreddit = main.reddit.subreddit(main.subreddit_choice)
-        main.logger = logmaker.make_logger("MAIN")
+        main.logger = logmaker.make_logger("CLI-MAIN")
         print()
         print("commands:")
         print("message check")
         print("post reply")
         print("comment reply")
         print("find mentions")
+        print("downvote remover")
         print("all")
+        print("import")
         print("exit")
         print("add -x flag to add a repetition loop with x minutes pause")
         print()
@@ -41,7 +46,7 @@ class CommandLineInterface():
             while loop:
                 try:
                     if "message check" in command or "all" in command:
-                        main.blacklist_check()
+                        main.message_check()
                     if "post reply" in command or "all" in command:
                         main.post_reply(main.subreddit)
                     if "comment reply" in command or "all" in command:
@@ -49,7 +54,9 @@ class CommandLineInterface():
                     if "find mentions" in command or "all" in command:
                         main.find_mentions()
                     if "downvote remover" in command or "all" in command:
-                        downvote.downvote_remover(main.reddit)
+                        downvote.downvoted_remover(main.reddit)
+                    if "import" in command or "all" in command:
+                        self.import_creds()
                     if command == "exit":
                         main.stopbot(True)
                     if "-" not in command:
@@ -73,6 +80,7 @@ class CommandLineInterface():
             return r
         except Exception as e:
             self.logger.error("Exception {} occurred on login".format(e))
+            main.stopbot(False)
 
     def fetch_config(self, find):
         try:
@@ -92,6 +100,14 @@ class CommandLineInterface():
             value = input("Enter " + find + ": ")
             dh.data_insert("configurations", [[find, value]])
             return value
+
+
+    def import_creds(self):
+        needed = ['client_id', 'client_secret', 'password', 'username', 'user_agent']
+        for i in needed:
+            dh.data_insert("configurations", [[i, getattr(botinfo, i)]])
+            self.logger.debug("Imported {}".format(i))
+
 
 
 if __name__ == "__main__":
