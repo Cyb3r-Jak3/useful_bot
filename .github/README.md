@@ -38,7 +38,7 @@ If you find one please submit it in the issues tab
 ---
 
 #### Future Features for Release V3: (Assistance)
-- [ ] Easier template layout.
-- [ ] Easier customization.
+- [x] Easier template layout.
+- [x] Easier customization.
 - [ ] Easier to add functions
 - [ ] More execption handling

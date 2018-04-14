@@ -45,6 +45,8 @@ class CommandLineInterface():
                 delay = int(command.split("-")[1])
             while loop:
                 try:
+                    if "import" in command or "all" in command:
+                        self.import_creds()
                     if "message check" in command or "all" in command:
                         main.message_check()
                     if "post reply" in command or "all" in command:
@@ -55,8 +57,6 @@ class CommandLineInterface():
                         main.find_mentions()
                     if "downvote remover" in command or "all" in command:
                         downvote.downvoted_remover(main.reddit)
-                    if "import" in command or "all" in command:
-                        self.import_creds()
                     if command == "exit":
                         main.stopbot(True)
                     if "-" not in command:
@@ -101,13 +101,11 @@ class CommandLineInterface():
             dh.data_insert("configurations", [[find, value]])
             return value
 
-
     def import_creds(self):
         needed = ['client_id', 'client_secret', 'password', 'username', 'user_agent']
         for i in needed:
             dh.data_insert("configurations", [[i, getattr(botinfo, i)]])
             self.logger.debug("Imported {}".format(i))
-
 
 
 if __name__ == "__main__":
