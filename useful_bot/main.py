@@ -1,5 +1,5 @@
-## Either default or built in
-import praw, re, datetime, os, sys, time
+# Global
+import praw, re, datetime, os, sys
 # Local
 import datahandler, logmaker, botinfo
 
@@ -50,7 +50,7 @@ def start():
 
 
 def post_reply(subreddit):
-    logger.info("Starting posts")
+    logger.info("Starting Posts")
     toadd = []
     for submission in subreddit.hot(limit=10):  # Gets submissions from the subreddit. Here it has a limit of 10
         add = []
@@ -66,7 +66,7 @@ def post_reply(subreddit):
                 break
 
     datahandler.data_insert("Posts", toadd)
-    logger.info("Finished posts")
+    logger.info("Finished Posts")
 
 
 def comment_reply(subreddit):
@@ -147,7 +147,7 @@ def find_mentions():
     toadd = []
     for x in reddit.inbox.mentions():
         if str(x) not in mentions:
-            logger.info("Found mention {id}. User {user} Body {body}".format(id=x, user=x.author, body=x.body))
+            logger.debug("Found mention {id}. User {user} Body {body}".format(id=x, user=x.author, body=x.body))
             x.reply("Hello, I see you mentioned me. How can I help?")
             logger.debug("Replying to {}".format(x))
             marked = [x.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')]

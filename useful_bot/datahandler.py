@@ -1,4 +1,4 @@
-# Either default or built in
+# Global
 import sqlite3
 # Local
 import logmaker
