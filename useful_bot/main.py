@@ -1,7 +1,7 @@
 # Global
 import praw, re, datetime, os, sys
 # Local
-import datahandler, logmaker, botinfo
+import datahandler, logmaker, botinfo, downvote
 
 
 def stopbot(delete):
@@ -167,4 +167,5 @@ if __name__ == "__main__":
     post_reply(subreddit)
     comment_reply(subreddit)
     find_mentions()
+    downvote.downvoted_remover(reddit)
     stopbot(True)
