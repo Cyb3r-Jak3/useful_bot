@@ -50,7 +50,7 @@ def start():
 
 
 def post_reply(subreddit):
-    logger.debug("Replying to posts")
+    logger.info("Starting posts")
     toadd = []
     for submission in subreddit.hot(limit=10):  # Gets submissions from the subreddit. Here it has a limit of 10
         add = []
@@ -65,13 +65,12 @@ def post_reply(subreddit):
                 toadd.append(add)
                 break
 
-    logger.debug("Replied to posts")
     datahandler.data_insert("Posts", toadd)
-    logger.debug("Finished with posts")
+    logger.info("Finished posts")
 
 
 def comment_reply(subreddit):
-    logger.debug("Replying to comments")
+    logger.info("Starting Comments")
     toadd = []
     for post in subreddit.hot(limit=10):  # Gets the top 10 posts in the subreddit
         submission = reddit.submission(post)
@@ -88,16 +87,17 @@ def comment_reply(subreddit):
                 add.append(botinfo.subreddit)
                 if "{user}" in botinfo.comment_reply:
                     comment.reply(botinfo.comment_reply.format(user=author))
+                else:
+                    comment_reply(botinfo.comment_reply)
                 logger.debug("Bot replying to {0}".format(text))
                 toadd.append(add)
 
-    logger.debug("Replied to all comments")
     datahandler.data_insert("Comments", toadd)
-    logger.debug("Wrote comment ids")
+    logger.info("Finished Comments")
 
 
 def message_check():
-    logger.info("Checking Messages")
+    logger.info("Starting Messages")
     marked = []
     for x in reddit.inbox.unread():
         subject = x.subject.lower()
@@ -114,11 +114,12 @@ def message_check():
             logger.info("Unblacklisting " + x.author.name)
             message_send(x.author.name, "blacklist remove")
             marked.append(x)
-        else:
+        elif subject != "username mention":
             logger.info("Message with subject and body not understood. Subject: {0}   Body: {1}".format(x.subject, x.body))
             message_send(x.author.name, "unknown")
             marked.append(x)
     reddit.inbox.mark_read(marked)
+    logger.info("Finished Messages")
 
 
 def message_send(user, type):
@@ -148,6 +149,7 @@ def find_mentions():
         if str(x) not in mentions:
             logger.info("Found mention {id}. User {user} Body {body}".format(id=x, user=x.author, body=x.body))
             x.reply("Hello, I see you mentioned me. How can I help?")
+            logger.debug("Replying to {}".format(x))
             marked = [x.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
             toadd.append(marked)
     datahandler.data_insert("replied_mentions", toadd)
@@ -156,7 +158,7 @@ def find_mentions():
 if __name__ == "__main__":
     datahandler.create()
     logger = logmaker.make_logger("Main")
-    logger.debug("Staring up")
+    logger.info("Starting up")
     reddit = start()
     subreddit_choice = botinfo.subreddit
     subreddit = reddit.subreddit(botinfo.subreddit)
