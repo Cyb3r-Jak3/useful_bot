@@ -7,7 +7,7 @@ A reddit bot in python, using praw.
 
 End goal of this project is to have an easy to use reddit bot template
 
-Nice CLI written by [samuellando](https://github.com/samuellando "Author")
+Nice CLI written by [samuellando](https://github.com/samuellando "Author's Github Profile")
 
 ---
 
@@ -28,6 +28,8 @@ To run:
 * Be able to blacklist subreddits if contacted
   * Can unblacklist unblacklisting
 *  Respond to username mentions
+* Additional Responses to messages
+* Templete for simlple features
 
 ---
 
@@ -36,11 +38,6 @@ To run:
 If you find one please submit it in the issues tab
 
 ---
-
-#### Future Features for Release V3: (Assistance)
-- [x] Easier template layout.
-- [x] Easier customization.
-- [x] More execption handling
 
 
 ##### Future Release Plans
