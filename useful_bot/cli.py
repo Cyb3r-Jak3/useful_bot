@@ -84,15 +84,6 @@ class CommandLineInterface():
         try:
             values = dh.data_fetch("configurations", "value")
             ids = dh.data_fetch("configurations", "id")
-            # Convert strings to proper lists
-            # values = values.replace("[", "")
-            # values = values.replace("]", "")
-            # values = values.replace("'", "")
-            # values = values.split(", ")
-            # ids = ids.replace("[", "")
-            # ids = ids.replace("]", "")
-            # ids = ids.replace("'", "")
-            # ids = ids.split(", ")
             return values[ids.index(find)]
         except Exception as e:
             choice = input("Enter I to import credentials from botinfo").lower()
