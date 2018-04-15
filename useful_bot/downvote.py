@@ -1,7 +1,5 @@
-# Global
-import praw
-# Local
-import logmaker, main, botinfo
+# Internal
+import logmaker, botinfo
 
 
 def downvoted_remover(r):
@@ -18,7 +16,7 @@ def downvoted_remover(r):
             comment.delete()
             deleted += 1
     if deleted == 0:
-        logger.info("No comments were deleted")
+        logger.debug("No comments were deleted")
     else:
         logger.info("{0} comments were deleted".format(deleted))
 

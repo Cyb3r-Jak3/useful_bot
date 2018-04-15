@@ -1,10 +1,10 @@
-# Global
+# External
 import praw, re, datetime, os, sys
-# Local
+# Internal
 import datahandler, logmaker, botinfo, downvote
 
 
-def stopbot(delete):
+def stopbot(delete=False):
     logger.info("Shutting down")
     if delete:
         logger.info("Deleting log file")
@@ -17,24 +17,28 @@ def getprevious():
         comments = datahandler.data_fetch("Comments", "id")
     except Exception as e:
         logger.error("Error getting comment ids: " + str(e))
-        stopbot(False)
+        stopbot()
     try:
         posts = datahandler.data_fetch("Posts", "id")
     except Exception as e:
         logger.error("Error getting post ids: " + str(e))
-        stopbot(False)
+        stopbot()
     try:
         blacklist = datahandler.data_fetch("Blacklist", "user")
-        blacklist += " useful_bot"
+        blacklist.append("useful_bot")
     except Exception as e:
         logger.error("Error getting blacklisted users: " + str(e))
-        stopbot(False)
+        stopbot()
     try:
         mentions = datahandler.data_fetch("replied_mentions", "id")
     except Exception as e:
         logger.error("Error getting mentions: " + str(e))
-        stopbot(False)
-    return comments, posts, blacklist, mentions
+        stopbot()
+    try:
+        message_responses = datahandler.data_fetch("message_responses", "*")
+    except Exception as e:
+        logger.error("Error getting message responses: " + str(e))
+    return comments, posts, blacklist, mentions, message_responses
 
 
 def start():
@@ -46,7 +50,7 @@ def start():
         return r
     except Exception as e:
         logger.error("Exception {} occurred on login".format(e))
-        stopbot(False)
+        stopbot()
 
 
 def post_reply(subreddit):
@@ -56,14 +60,17 @@ def post_reply(subreddit):
         add = []
         if submission.id not in posts_replied_to:
             if (re.search(botinfo.post_text, submission.title, re.IGNORECASE)) and (submission.author.name not in blacklisted):
-                add.append(submission.id)
-                submission.reply(botinfo.post_reply)
-                add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                logger.debug("Bot replying to : {0}".format(submission.title))
-                add.append(botinfo.subreddit)
-                add.append(botinfo.post_reply)
-                toadd.append(add)
-                break
+                try:
+                    add.append(submission.id)
+                    submission.reply(botinfo.post_reply)
+                    add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                    logger.debug("Bot replying to : {0}".format(submission.title))
+                    add.append(botinfo.subreddit)
+                    add.append(botinfo.post_reply)
+                    toadd.append(add)
+                    break
+                except Exception as e:
+                    logger.warn(e)
 
     datahandler.data_insert("Posts", toadd)
     logger.info("Finished Posts")
@@ -80,17 +87,20 @@ def comment_reply(subreddit):
             text = comment.body
             author = comment.author.name
             if (botinfo.comment_text in text.lower()) and (comment.id not in comments_replied_to) and \
-                    (str(author) not in blacklisted):
-                add.append(comment.id)
-                add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                add.append(botinfo.comment_reply)
-                add.append(botinfo.subreddit)
-                if "{user}" in botinfo.comment_reply:
-                    comment.reply(botinfo.comment_reply.format(user=author))
-                else:
-                    comment_reply(botinfo.comment_reply)
-                logger.debug("Bot replying to {0}".format(text))
-                toadd.append(add)
+                    (author.lower() not in blacklisted):
+                try:
+                    add.append(comment.id)
+                    add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                    add.append(botinfo.comment_reply)
+                    add.append(botinfo.subreddit)
+                    if "{user}" in botinfo.comment_reply:
+                        comment.reply(botinfo.comment_reply.format(user=author))
+                    else:
+                        comment_reply(botinfo.comment_reply)
+                    logger.debug("Bot replying to {0}".format(text))
+                    toadd.append(add)
+                except Exception as e:
+                    logger.warn(e)
 
     datahandler.data_insert("Comments", toadd)
     logger.info("Finished Comments")
@@ -147,11 +157,14 @@ def find_mentions():
     toadd = []
     for x in reddit.inbox.mentions():
         if str(x) not in mentions:
-            logger.debug("Found mention {id}. User {user} Body {body}".format(id=x, user=x.author, body=x.body))
-            x.reply("Hello, I see you mentioned me. How can I help?")
-            logger.debug("Replying to {}".format(x))
-            marked = [x.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
-            toadd.append(marked)
+            try:
+                logger.debug("Found mention {id}. User {user} Body {body}".format(id=x, user=x.author, body=x.body))
+                x.reply("Hello, I see you mentioned me. How can I help?")
+                logger.debug("Replying to {}".format(x))
+                marked = [x.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
+                toadd.append(marked)
+            except Exception as e:
+                logger.warn(e)
     datahandler.data_insert("replied_mentions", toadd)
 
 
@@ -162,7 +175,7 @@ if __name__ == "__main__":
     reddit = start()
     subreddit_choice = botinfo.subreddit
     subreddit = reddit.subreddit(botinfo.subreddit)
-    comments_replied_to, posts_replied_to, blacklisted, mentions = getprevious()
+    comments_replied_to, posts_replied_to, blacklisted, mentions, message_responses = getprevious()
     message_check()
     post_reply(subreddit)
     comment_reply(subreddit)

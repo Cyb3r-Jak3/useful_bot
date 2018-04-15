@@ -1,6 +1,6 @@
-# Global
+# External
 import logging
-# Local
+# Internal
 import botinfo
 
 

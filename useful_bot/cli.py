@@ -1,6 +1,6 @@
 # External
 import praw, time
-# Local
+# Internal
 import datahandler as dh
 import logmaker, main, botinfo, downvote
 
@@ -11,6 +11,7 @@ class CommandLineInterface():
         self.logger.debug("Starting CLI")
         # Connect to db.
         dh.create()
+
         # Start praw object using credentials in data base.
         self.r = self.start_bot()
         self.run()
@@ -31,13 +32,12 @@ class CommandLineInterface():
         print("find mentions")
         print("downvote remover")
         print("all")
-        print("import")
         print("exit")
         print("add -x flag to add a repetition loop with x minutes pause")
         print()
         while True:
             command = input("> ")
-            comments_replied_to, posts_replied_to, blacklisted, mentions = main.getprevious()
+            main.comments_replied_to, main.posts_replied_to, main.blacklisted, main.mentions, main.message_responses = main.getprevious()
             loop = True
             delay = 0
             if "-" in command:
@@ -45,8 +45,6 @@ class CommandLineInterface():
                 delay = int(command.split("-")[1])
             while loop:
                 try:
-                    if "import" in command or "all" in command:
-                        self.import_creds()
                     if "message check" in command or "all" in command:
                         main.message_check()
                     if "post reply" in command or "all" in command:
@@ -87,25 +85,28 @@ class CommandLineInterface():
             values = dh.data_fetch("configurations", "value")
             ids = dh.data_fetch("configurations", "id")
             # Convert strings to proper lists
-            values = values.replace("[", "")
-            values = values.replace("]", "")
-            values = values.replace("'", "")
-            values = values.split(", ")
-            ids = ids.replace("[", "")
-            ids = ids.replace("]", "")
-            ids = ids.replace("'", "")
-            ids = ids.split(", ")
+            # values = values.replace("[", "")
+            # values = values.replace("]", "")
+            # values = values.replace("'", "")
+            # values = values.split(", ")
+            # ids = ids.replace("[", "")
+            # ids = ids.replace("]", "")
+            # ids = ids.replace("'", "")
+            # ids = ids.split(", ")
             return values[ids.index(find)]
         except Exception as e:
-            value = input("Enter " + find + ": ")
-            dh.data_insert("configurations", [[find, value]])
-            return value
+            choice = input("Enter I to import credentials from botinfo").lower()
+            if choice == "i":
+                value = self.import_creds(find)
+                dh.data_insert("configurations", [[find, value]])
+                return value
+            else:
+                value = input("Enter " + find + ": ")
+                dh.data_insert("configurations", [[find, value]])
+                return value
 
-    def import_creds(self):
-        needed = ['client_id', 'client_secret', 'password', 'username', 'user_agent']
-        for i in needed:
-            dh.data_insert("configurations", [[i, getattr(botinfo, i)]])
-            self.logger.debug("Imported {}".format(i))
+    def import_creds(self, find):
+        return getattr(botinfo, find)
 
 
 if __name__ == "__main__":
