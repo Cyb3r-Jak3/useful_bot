@@ -106,25 +106,36 @@ def comment_reply(subreddit):
     logger.info("Finished Comments")
 
 
-def message_check():
+def message_check(additional):
     logger.info("Starting Messages")
     marked = []
     for x in reddit.inbox.unread():
-        subject = x.subject.lower()
+        to_break = False
+        received_subject = x.subject.lower()
         name = x.author.name.lower()
-        if (("stop" == subject) or ("blacklist" == subject)) \
+        if (("stop" == received_subject) or ("blacklist" == received_subject)) \
                 and name not in blacklisted:
             data = [[name, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), x.body]]
             logger.info("Blacklisting user: " + x.author.name)
             message_send(x.author.name, "blacklist add")
             datahandler.data_insert("Blacklist", data)
             marked.append(x)
-        elif (("resume" == subject) or ("unblacklist" == subject)) and name in blacklisted:
+        elif (("resume" == received_subject) or ("unblacklist" == received_subject)) and name in blacklisted:
             datahandler.data_delete("Blacklist", "user", "\'{user}\'".format(user=name))
             logger.info("Unblacklisting " + x.author.name)
             message_send(x.author.name, "blacklist remove")
             marked.append(x)
-        elif subject != "username mention":
+        for i in range(len(additional)):
+            if additional[i][0] == received_subject:
+                global additional_choice
+                additional_choice = i
+                message_send(x.author.name, "additional")
+                to_break = True
+                marked.append(x)
+                break
+        if to_break:
+            break
+        elif received_subject != "username mention":
             logger.info("Message with subject and body not understood. Subject: {0}   Body: {1}".format(x.subject, x.body))
             message_send(x.author.name, "unknown")
             marked.append(x)
@@ -150,6 +161,9 @@ def message_send(user, type):
         message = "Hello {user},  \n" \
                   "This message is being sent to you because you have sent me a message that I am unsure how to deal with it.  \n " \
                   "Rest assure this has been recorded and a solution should be in progress. Thanks ".format(user=user)
+    if type == "additional":
+        subject = additional_responses[additional_choice][1]
+        message = additional_responses[additional_choice][2]
     reddit.redditor(user).message(subject, message)
 
 
@@ -175,11 +189,11 @@ if __name__ == "__main__":
     reddit = start()
     subreddit_choice = botinfo.subreddit
     subreddit = reddit.subreddit(botinfo.subreddit)
-    comments_replied_to, posts_replied_to, blacklisted, mentions, message_responses = getprevious()
-    print(message_responses)
-    # message_check()
-    # post_reply(subreddit)
-    # comment_reply(subreddit)
-    # find_mentions()
-    # downvote.downvoted_remover(reddit)
+    comments_replied_to, posts_replied_to, blacklisted, mentions, additional_responses = getprevious()
+    additional_choice = None
+    message_check(additional_responses)
+    post_reply(subreddit)
+    comment_reply(subreddit)
+    find_mentions()
+    downvote.downvoted_remover(reddit)
     stopbot(True)

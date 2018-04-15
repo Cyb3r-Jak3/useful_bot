@@ -37,7 +37,7 @@ class CommandLineInterface():
         print()
         while True:
             command = input("> ")
-            main.comments_replied_to, main.posts_replied_to, main.blacklisted, main.mentions, main.message_responses = main.getprevious()
+            main.comments_replied_to, main.posts_replied_to, main.blacklisted, main.mentions, main.additional_responses = main.getprevious()
             loop = True
             delay = 0
             if "-" in command:
@@ -46,7 +46,7 @@ class CommandLineInterface():
             while loop:
                 try:
                     if "message check" in command or "all" in command:
-                        main.message_check()
+                        main.message_check(main.additional_responses)
                     if "post reply" in command or "all" in command:
                         main.post_reply(main.subreddit)
                     if "comment reply" in command or "all" in command:

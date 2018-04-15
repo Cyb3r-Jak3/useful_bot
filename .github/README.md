@@ -40,5 +40,11 @@ If you find one please submit it in the issues tab
 #### Future Features for Release V3: (Assistance)
 - [x] Easier template layout.
 - [x] Easier customization.
-- [ ] Easier to add functions
-- [ ] More execption handling
+- [x] More execption handling
+
+
+##### Future Release Plans
+###### These are subject to change without notice
+  3.1 - Add cli function to add message responses
+  3.2 - Add ways to format user information in addiontal responses
+  3.3 - Format in proper PEP8 Standards
