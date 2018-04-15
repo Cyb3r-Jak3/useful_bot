@@ -1,6 +1,6 @@
-# Either default or built in
+# External
 import sqlite3
-# Local
+# Internal
 import logmaker
 
 connection = sqlite3.connect("data.db")
@@ -30,10 +30,14 @@ PRIMARY KEY (user));""", """
 CREATE TABLE IF NOT EXISTS replied_mentions (
 id text NOT NULL DEFAULT '',
 time text,
-PRIMARY KEY (id));""","""
+PRIMARY KEY (id));""", """
 CREATE TABLE IF NOT EXISTS configurations (
 id text NOT NULL DEFAULT '',
-value text);"""]
+value text);""", """
+CREATE TABLE IF NOT EXISTS message_responses (
+keyword text NOT NULL DEFAULT '',
+reply_subject text,
+reply_message text);"""]
     for i in commands:
         cursor.execute(i)
 
@@ -65,7 +69,14 @@ def data_insert(table, data):
                 connection.commit()
             except Exception as e:
                 logger.error(e)
-
+    elif table == "message_responses":
+        for i in data:
+            format_str = """ INSERT OR IGNORE INTO {choice} (keyword, reply_subject, reply_message) VALUES (?, ?, ?)""".format(choice=table)
+            try:
+                cursor.execute(format_str, (i[0], i[1], i[2]))
+                connection.commit()
+            except Exception as e:
+                logger.error(e)
     else:
         for i in data:
             format_str = """ INSERT OR IGNORE INTO {choice} (id, time, subreddit, reply) VALUES (?, ?, ?, ?)""".format(
@@ -79,8 +90,13 @@ def data_insert(table, data):
 
 def data_fetch(table, ident):
     cursor.execute("SELECT {ident} FROM {table}".format(table=table, ident=ident))
-    result = list(cursor.fetchall())
-    result = "['%s']" % "', '".join([t[0] for t in result])
+    fetched = cursor.fetchall()
+    if table == "message_responses":
+        result = fetched
+    else:
+        result = []
+        for i in range(len(fetched)):
+            result.append(fetched[i][0])
     return result
 
 
