@@ -45,6 +45,6 @@ If you find one please submit it in the issues tab
 
 ##### Future Release Plans
 ###### These are subject to change without notice
-  3.1 - Add cli function to add message responses
-  3.2 - Add ways to format user information in addiontal responses
+  3.1 - Add cli function to add message responses  
+  3.2 - Add ways to format user information in addiontal responses  
   3.3 - Format in proper PEP8 Standards
