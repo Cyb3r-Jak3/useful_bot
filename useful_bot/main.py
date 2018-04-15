@@ -62,7 +62,10 @@ def post_reply(subreddit):
             if (re.search(botinfo.post_text, submission.title, re.IGNORECASE)) and (submission.author.name not in blacklisted):
                 try:
                     add.append(submission.id)
-                    submission.reply(botinfo.post_reply)
+                    if "{user}" in botinfo.post_reply:
+                        submission.reply(botinfo.post_reply.format(user=submission.author.name))
+                    else:
+                        submission.reply(botinfo.post_reply)
                     add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
                     logger.debug("Bot replying to : {0}".format(submission.title))
                     add.append(botinfo.subreddit)
