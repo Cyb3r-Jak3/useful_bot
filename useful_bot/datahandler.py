@@ -91,9 +91,12 @@ def data_insert(table, data):
 def data_fetch(table, ident):
     cursor.execute("SELECT {ident} FROM {table}".format(table=table, ident=ident))
     fetched = cursor.fetchall()
-    result = []
-    for i in range(len(fetched)):
-        result.append(fetched[i][0])
+    if table == "message_responses":
+        result = fetched
+    else:
+        result = []
+        for i in range(len(fetched)):
+            result.append(fetched[i][0])
     return result
 
 
