@@ -1,4 +1,4 @@
-Fixes # or improves by addding:
+Fixes # or improves by adding:
 -------------------------------
 -
 -
