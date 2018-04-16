@@ -91,7 +91,7 @@ def data_insert(table, data):
 def data_fetch(table, ident):
     cursor.execute("SELECT {ident} FROM {table}".format(table=table, ident=ident))
     fetched = cursor.fetchall()
-    if table == "message_responses":
+    if ident == "*":
         result = fetched
     else:
         result = []
@@ -104,3 +104,12 @@ def data_delete(table, choice, ident):
     command = ("DELETE FROM {table} WHERE {choice}={ident}".format(table=table, choice=choice, ident=ident))
     cursor.execute(command)
     connection.commit()
+
+
+def table_fetch():
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cursor.fetchall()
+    result = []
+    for i in range(len(tables)):
+        result.append(tables[i][0])
+    return result

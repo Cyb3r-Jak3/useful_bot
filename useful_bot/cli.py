@@ -23,9 +23,9 @@ class CommandLineInterface():
             main.subreddit_choice = botinfo.subreddit
         main.reddit = self.r
         main.subreddit = main.reddit.subreddit(main.subreddit_choice)
-        main.logger = logmaker.make_logger("CLI-MAIN")
+        main.logger = logmaker.make_logger("CLI")
         print()
-        print("commands:")
+        print("Commands:")
         print("message check")
         print("post reply")
         print("comment reply")
@@ -33,6 +33,10 @@ class CommandLineInterface():
         print("downvote remover")
         print("all")
         print("exit")
+        print()
+        print("Extra:")
+        print("response add")
+        print("table search")
         print("add -x flag to add a repetition loop with x minutes pause")
         print()
         while True:
@@ -55,6 +59,10 @@ class CommandLineInterface():
                         main.find_mentions()
                     if "downvote remover" in command or "all" in command:
                         downvote.downvoted_remover(main.reddit)
+                    if "response add" in command:
+                        self.response_add()
+                    if "table search" in command:
+                        self.search()
                     if command == "exit":
                         main.stopbot(True)
                     if "-" not in command:
@@ -88,7 +96,7 @@ class CommandLineInterface():
         except Exception as e:
             choice = input("Enter I to import credentials from botinfo").lower()
             if choice == "i":
-                value = self.import_creds(find)
+                value = getattr(botinfo, find)
                 dh.data_insert("configurations", [[find, value]])
                 return value
             else:
@@ -96,9 +104,29 @@ class CommandLineInterface():
                 dh.data_insert("configurations", [[find, value]])
                 return value
 
-    def import_creds(self, find):
-        return getattr(botinfo, find)
+    def response_add(self):
+        to_add = []
+        to_add.append(input("Enter what the subject line you want to trigger a response: "))
+        to_add.append(input("Enter what you want the reply subject to be: "))
+        to_add.append(input("Enter the message for the reply: "))
+        print("For the message response template, {0} is the trigger word/phrase. {1} is the response subject and {2} is the response body. \n"
+              " Enter Y to conform, R to redo or N to cancel."
+              .format(to_add[0], to_add[1], to_add[2]))
+        if input().lower() == "y":
+            dh.data_insert("message_responses", list(to_add))
+        elif input().lower() == "r":
+            self.response_add()
 
+    def search(self):
+        tables = dh.table_fetch()
+        table = input("Available tables are {}. \nEnter the table: ".format(tables))
+        if table in tables:
+            print("Retrieving {}".format(table))
+            retrieved = dh.data_fetch(table, "*")
+            for i in range(len(retrieved)):
+                print(retrieved[i], "\n")
+
+    def data_delete(self):
 
 if __name__ == "__main__":
     C = CommandLineInterface()
