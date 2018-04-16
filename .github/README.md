@@ -19,12 +19,12 @@ pip install praw
 ```
 
 To run:  
-  ```    
-  python3 main.py
-  ```
+```    
+python3 main.py
+```
 or
 ```
-  python3 cli.py
+python3 cli.py
 ```
 ---
 
@@ -49,7 +49,7 @@ If you find one please submit it in the issues tab
 
 
 ##### Future Release Plans
-###### These are subject to change without notice
+###### These are subject to change without notice, but I will do my best to update this section
   ~~3.1 - Add cli function to add message responses~~  
      -> 3.2 allows for the main to import credentials from the configurations  
   3.~~2~~3 - Add ways to format user information in addiontal responses  
