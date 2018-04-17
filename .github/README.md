@@ -29,15 +29,13 @@ python3 cli.py
 ```
 ---
 #### Versions
-Stable are bold  
 
 
 Number | Date | Download Link
 ---|---|---
-Version 3.1 | April 16th, 2018 | [Link](https://github.com/coolaspie/useful_bot/tree/45b69f630b1edd89bbb803c6ce5d699a0dbbbb3a)
-**Version 3** | April 15th, 2018 | [Link](https://github.com/coolaspie/useful_bot/releases/download/V3/useful_bot-master.zip)
-**Version 2** | April 13th, 2018 | [Link](https://github.com/coolaspie/useful_bot/releases/download/v2.0/useful_bot.zip)
-**Version 1** | April 5th, 2018 | [Link](https://github.com/coolaspie/useful_bot/releases/tag/v1.0)
+Version 3 | April 15th, 2018 | [Link](https://github.com/coolaspie/useful_bot/releases/download/V3/useful_bot-master.zip)
+Version 2 | April 13th, 2018 | [Link](https://github.com/coolaspie/useful_bot/releases/download/v2.0/useful_bot.zip)
+Version 1 | April 5th, 2018 | [Link](https://github.com/coolaspie/useful_bot/releases/tag/v1.0)
 
 
 #### Currently:
