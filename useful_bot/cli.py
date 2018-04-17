@@ -31,13 +31,13 @@ class CommandLineInterface():
         print("comment reply")
         print("find mentions")
         print("downvote remover")
+        print("add -x flag to add a repetition loop with x minutes pause")
         print("all")
         print("exit")
         print()
         print("Extra:")
         print("response add")
         print("table search")
-        print("add -x flag to add a repetition loop with x minutes pause")
         print()
         while True:
             command = input("> ")
@@ -93,8 +93,8 @@ class CommandLineInterface():
             values = dh.data_fetch("configurations", "value")
             ids = dh.data_fetch("configurations", "id")
             return values[ids.index(find)]
-        except Exception as e:
-            choice = input("Enter I to import credentials from botinfo").lower()
+        except ValueError as ve:
+            choice = input("Enter I to import the credential {} from botinfo".format(find)).lower()
             if choice == "i":
                 value = getattr(botinfo, find)
                 dh.data_insert("configurations", [[find, value]])
@@ -103,6 +103,8 @@ class CommandLineInterface():
                 value = input("Enter " + find + ": ")
                 dh.data_insert("configurations", [[find, value]])
                 return value
+        except Exception as e:
+            self.logger.error("There was an error retrieving credentials: {} ".format(e))
 
     def response_add(self):
         to_add = []
