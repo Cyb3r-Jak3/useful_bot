@@ -126,7 +126,6 @@ class CommandLineInterface():
             for i in range(len(retrieved)):
                 print(retrieved[i], "\n")
 
-    def data_delete(self):
 
 if __name__ == "__main__":
     C = CommandLineInterface()

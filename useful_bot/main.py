@@ -1,5 +1,6 @@
 # External
 import praw, re, datetime, os, sys
+from sqlite3 import OperationalError
 # Internal
 import datahandler, logmaker, botinfo, downvote
 
@@ -48,9 +49,27 @@ def start():
         r.user.me()  # Verify log in, will raise exception if log in failed.
         logger.info("Successfully logged in")
         return r
-    except Exception as e:
-        logger.error("Exception {} occurred on login".format(e))
-        stopbot()
+    except AttributeError as ae:
+        try:
+            if datahandler.data_fetch("configurations", "remember") == "yes":
+                needed = ["client_id", "client_secret", "password", "username", "user_agent"]
+                imports = []
+                for i in needed:
+                    imports.append(datahandler.data_fetch("configurations", i))
+                try:
+                    r = praw.Reddit(client_id=imports[0], client_secret=imports[1], password=imports[2], username=imports[3], user_agent=imports[4])
+                    r.user.me()
+                    logger.info("Successfully logged in")
+                except Exception as e:
+                    logger.error("Error when trying to import credentials: {}".format(e))
+                    stopbot()
+        except OperationalError as oe:
+            logger.error("There was an error trying to import the credentials. This either means that it was never setup"
+                         " or there was actually an error.\nIf you want to to be able to import credentials then add them from the cli")
+            stopbot()
+        except Exception as e:
+            logger.error("There was an error when dealing with credentials: {}".format(e))
+            stopbot()
 
 
 def post_reply(subreddit):
@@ -162,8 +181,8 @@ def message_send(user, type):
     if type == "unknown":
         subject = "Message Unknown"
         message = "Hello {user},  \n" \
-                  "This message is being sent to you because you have sent me a message that I am unsure how to deal with it.  \n " \
-                  "Rest assure this has been recorded and a solution should be in progress. Thanks ".format(user=user)
+                  "This message is being sent to you because you have sent me a message that I am unsure how to deal with it. " \
+                  " \nRest assure this has been recorded and a solution should be in progress. Thanks ".format(user=user)
     if type == "additional":
         subject = additional_responses[additional_choice][1]
         message = additional_responses[additional_choice][2]

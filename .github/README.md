@@ -61,8 +61,10 @@ If you find one please submit it in the issues tab
 
 
 ##### Future Release Plans
-###### These are subject to change without notice, but I will do my best to update this section
+###### These are subject to change without notice, but I will do my best to update this section.
+###### Bold number indicate a release [here](https://github.com/coolaspie/useful_bot/releases)
   ~~3.1 - Add cli function to add message responses~~  
      -> 3.2 allows for the main to import credentials from the configurations  
   3.~~2~~3 - Add ways to format user information in addiontal responses  
-  3.~~3~~4 - Format in proper PEP8 Standards
+  3.~~3~~4 - Format in proper PEP8 Standards  
+  **3.5** Add footers to replies
