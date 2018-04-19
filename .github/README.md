@@ -15,8 +15,8 @@ You need to have your own api credentials. If you do not head [here](https://www
 Currently recommended that you enter the credtinals in botinfo.example.py and rename the file to. It is the recommended approach because you can run the cli and import the credtinals from the botinfo file but you can not currently run the main.py off the database credtinals.
 The master may not work. If you want a stable verison use one from the [releases](https://github.com/coolaspie/useful_bot/releases "useful bot releases")   
 ``` 
+pip install praw  
 git clone https://github.com/coolaspie/useful_bot.git  
-pip install praw 
 ```
 
 To run:  
@@ -62,8 +62,5 @@ If you find one please submit it in the issues tab
 ##### Future Release Plans
 ###### These are subject to change without notice, but I will do my best to update this section.
 ###### Bold number indicate a planned release 
-  ~~3.1 - Add cli function to add message responses~~  
-     -> ~~3.2 allows for the main to import credentials from the configurations~~  
-  3.~~2~~3 - Add ways to format user information in addiontal responses & Add footers  
-  3.~~3~~4 - Format in proper PEP8 Standards  
-  **3.5** ~~Add footers to replies~~
+  3.4 - Check to make sure that the downvote comments actually work   
+  **3.5** Format in proper PEP8 Standards
