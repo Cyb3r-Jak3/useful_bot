@@ -6,7 +6,7 @@ def downvoted_remover(r):
     logger = logmaker.make_logger("Comment Remover")
     logger.info("Starting Downvoted Removal")
 
-    comments = r.redditor(botinfo.username).comments.controversial()
+    comments = r.redditor(botinfo.username).comments.controversial(limit=1000)
 
     deleted = 0
 

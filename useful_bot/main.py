@@ -81,10 +81,7 @@ def post_reply(subreddit):
             if (re.search(botinfo.post_text, submission.title, re.IGNORECASE)) and (submission.author.name not in blacklisted):
                 try:
                     add.append(submission.id)
-                    if "{user}" in botinfo.post_reply:
-                        submission.reply(botinfo.post_reply.format(user=submission.author.name))
-                    else:
-                        submission.reply(botinfo.post_reply)
+                    submission.reply(reply_format(botinfo.post_reply, submission.author))
                     add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
                     logger.debug("Bot replying to : {0}".format(submission.title))
                     add.append(botinfo.subreddit)
@@ -115,10 +112,7 @@ def comment_reply(subreddit):
                     add.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
                     add.append(botinfo.comment_reply)
                     add.append(botinfo.subreddit)
-                    if "{user}" in botinfo.comment_reply:
-                        comment.reply(botinfo.comment_reply.format(user=author))
-                    else:
-                        comment_reply(botinfo.comment_reply)
+                    comment.reply(reply_format(botinfo.comment_reply, author))
                     logger.debug("Bot replying to {0}".format(text))
                     toadd.append(add)
                 except Exception as e:
@@ -126,6 +120,13 @@ def comment_reply(subreddit):
 
     datahandler.data_insert("Comments", toadd)
     logger.info("Finished Comments")
+
+
+def reply_format(unformated, author):
+    if "{user}" in unformated:
+        unformated = unformated.format(user=author)
+    formatted = unformated + botinfo.footer
+    return formatted
 
 
 def message_check(additional):

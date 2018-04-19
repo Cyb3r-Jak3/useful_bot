@@ -52,6 +52,7 @@ Version 1 | April 5th, 2018 | [Link](https://github.com/coolaspie/useful_bot/rel
 ---
 
 #### Issues:
+* Have not seen proof the that downvote remover works
 
 If you find one please submit it in the issues tab
 
@@ -63,6 +64,6 @@ If you find one please submit it in the issues tab
 ###### Bold number indicate a planned release 
   ~~3.1 - Add cli function to add message responses~~  
      -> ~~3.2 allows for the main to import credentials from the configurations~~  
-  3.~~2~~3 - Add ways to format user information in addiontal responses  
+  3.~~2~~3 - Add ways to format user information in addiontal responses & Add footers  
   3.~~3~~4 - Format in proper PEP8 Standards  
-  **3.5** Add footers to replies
+  **3.5** ~~Add footers to replies~~
