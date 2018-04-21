@@ -62,5 +62,4 @@ If you find one please submit it in the issues tab
 ##### Future Release Plans
 ###### These are subject to change without notice, but I will do my best to update this section.
 ###### Bold number indicate a planned release 
-  3.4 - Check to make sure that the downvote comments actually work   
-  **3.5** Format in proper PEP8 Standards
+* 3.6 CLI import credentials 

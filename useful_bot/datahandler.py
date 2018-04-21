@@ -9,18 +9,18 @@ cursor = connection.cursor()
 
 def create():
     commands = ["""
-CREATE TABLE IF NOT EXISTS Posts ( 
+CREATE TABLE IF NOT EXISTS Posts (
 id text NOT NULL DEFAULT '',
 time text NOT NULL,
 subreddit text,
 reply text,
 PRIMARY KEY (id)
 );""", """
-CREATE TABLE IF NOT EXISTS Comments ( 
+CREATE TABLE IF NOT EXISTS Comments (
 id text NOT NULL DEFAULT '',
 time text NOT NULL,
 subreddit text,
-reply text, 
+reply text,
 PRIMARY KEY (id)); """, """
 CREATE TABLE IF NOT EXISTS Blacklist (
 user text NOT NULL DEFAULT '',
@@ -55,7 +55,8 @@ def data_insert(table, data):
                 logger.error(e)
     elif table == "replied_mentions":
         for i in data:
-            format_str = """ INSERT OR IGNORE INTO {choice} (id, time) VALUES (?, ?)""".format(choice=table)
+            format_str = """ INSERT OR IGNORE INTO {choice} (id, time) VALUES (?, ?)""".format(
+                choice=table)
             try:
                 cursor.execute(format_str, (i[0], i[1]))
                 connection.commit()
@@ -63,7 +64,8 @@ def data_insert(table, data):
                 logger.error(e)
     elif table == "configurations":
         for i in data:
-            format_str = """ INSERT OR IGNORE INTO {choice} (id, value) VALUES (?, ?)""".format(choice=table)
+            format_str = """ INSERT OR IGNORE INTO {choice} (id, value) VALUES (?, ?)""".format(
+                choice=table)
             try:
                 cursor.execute(format_str, (i[0], i[1]))
                 connection.commit()
@@ -71,7 +73,8 @@ def data_insert(table, data):
                 logger.error(e)
     elif table == "message_responses":
         for i in data:
-            format_str = """ INSERT OR IGNORE INTO {choice} (keyword, reply_subject, reply_message) VALUES (?, ?, ?)""".format(choice=table)
+            format_str = """ INSERT OR IGNORE INTO {choice} (keyword, reply_subject, reply_message) VALUES (?, ?, ?)""".format(
+                choice=table)
             try:
                 cursor.execute(format_str, (i[0], i[1], i[2]))
                 connection.commit()
@@ -89,7 +92,9 @@ def data_insert(table, data):
 
 
 def data_fetch(table, ident):
-    cursor.execute("SELECT {ident} FROM {table}".format(table=table, ident=ident))
+    cursor.execute(
+        "SELECT {ident} FROM {table}".format(
+            table=table, ident=ident))
     fetched = cursor.fetchall()
     if ident == "*":
         result = fetched
@@ -101,7 +106,11 @@ def data_fetch(table, ident):
 
 
 def data_delete(table, choice, ident):
-    command = ("DELETE FROM {table} WHERE {choice}={ident}".format(table=table, choice=choice, ident=ident))
+    command = (
+        "DELETE FROM {table} WHERE {choice}={ident}".format(
+            table=table,
+            choice=choice,
+            ident=ident))
     cursor.execute(command)
     connection.commit()
 

@@ -1,8 +1,12 @@
 # External
-import praw, time
+import praw
+import time
 # Internal
 import datahandler as dh
-import logmaker, main, botinfo, downvote
+import logmaker
+import main
+import botinfo
+import downvote
 
 
 class CommandLineInterface():
@@ -79,8 +83,12 @@ class CommandLineInterface():
             password = self.fetch_config('password')
             username = self.fetch_config('username')
             user_agent = self.fetch_config('user_agent')
-            r = praw.Reddit(client_id=client_id, client_secret=client_secret, password=password,
-                            username=username, user_agent=user_agent)
+            r = praw.Reddit(
+                client_id=client_id,
+                client_secret=client_secret,
+                password=password,
+                username=username,
+                user_agent=user_agent)
             r.user.me()  # Test authentication.
             self.logger.info("Successfully logged in")
             return r
@@ -94,7 +102,8 @@ class CommandLineInterface():
             ids = dh.data_fetch("configurations", "id")
             return values[ids.index(find)]
         except ValueError as ve:
-            choice = input("Enter I to import the credential {} from botinfo".format(find)).lower()
+            choice = input(
+                "Enter I to import the credential {} from botinfo".format(find)).lower()
             if choice == "i":
                 value = getattr(botinfo, find)
                 dh.data_insert("configurations", [[find, value]])
@@ -104,16 +113,21 @@ class CommandLineInterface():
                 dh.data_insert("configurations", [[find, value]])
                 return value
         except Exception as e:
-            self.logger.error("There was an error retrieving credentials: {} ".format(e))
+            self.logger.error(
+                "There was an error retrieving credentials: {} ".format(e))
 
     def response_add(self):
         to_add = []
-        to_add.append(input("Enter what the subject line you want to trigger a response: "))
+        to_add.append(
+            input("Enter what the subject line you want to trigger a response: "))
         to_add.append(input("Enter what you want the reply subject to be: "))
         to_add.append(input("Enter the message for the reply: "))
-        print("For the message response template, {0} is the trigger word/phrase. {1} is the response subject and {2} is the response body. \n"
-              " Enter Y to conform, R to redo or N to cancel."
-              .format(to_add[0], to_add[1], to_add[2]))
+        print(
+            "For the message response template, {0} is the trigger word/phrase. {1} is the response subject and {2} is the response body. \n"
+            " Enter Y to conform, R to redo or N to cancel." .format(
+                to_add[0],
+                to_add[1],
+                to_add[2]))
         if input().lower() == "y":
             dh.data_insert("message_responses", list(to_add))
         elif input().lower() == "r":
@@ -121,7 +135,8 @@ class CommandLineInterface():
 
     def search(self):
         tables = dh.table_fetch()
-        table = input("Available tables are {}. \nEnter the table: ".format(tables))
+        table = input(
+            "Available tables are {}. \nEnter the table: ".format(tables))
         if table in tables:
             print("Retrieving {}".format(table))
             retrieved = dh.data_fetch(table, "*")
