@@ -13,7 +13,7 @@ End goal of this project is to have an easy to use reddit bot template for anyon
 ### To use:
 You need to have your own api credentials. If you do not head [here](https://www.reddit.com/prefs/apps "reddit apps") and click create application -> script.
 Currently recommended that you enter the credtinals in botinfo.example.py and rename the file to. It is the recommended approach because you can run the cli and import the credtinals from the botinfo file but you can not currently run the main.py off the database credtinals.
-The master may not work. If you want a stable verison use one from the [releases](https://github.com/coolaspie/useful_bot/releases "useful bot releases")   
+Fully tested releases are [here](https://github.com/coolaspie/useful_bot/releases "useful bot releases")   
 ``` 
 pip install praw  
 git clone https://github.com/coolaspie/useful_bot.git  
