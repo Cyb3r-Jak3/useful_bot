@@ -1,6 +1,7 @@
 # External
 import praw
 import time
+import sys
 # Internal
 import datahandler as dh
 import logmaker
@@ -17,6 +18,9 @@ class CommandLineInterface():
         dh.create()
 
         # Start praw object using credentials in data base.
+        if sys.argv[1].lower() == "import":
+            self.cred_import()
+            return
         self.r = self.start_bot()
         self.run()
 
@@ -98,19 +102,19 @@ class CommandLineInterface():
 
     def fetch_config(self, find):
         try:
-            values = dh.data_fetch("configurations", "value")
-            ids = dh.data_fetch("configurations", "id")
+            values = dh.fetch("configurations", "value")
+            ids = dh.fetch("configurations", "id")
             return values[ids.index(find)]
         except ValueError as ve:
             choice = input(
                 "Enter I to import the credential {} from botinfo".format(find)).lower()
             if choice == "i":
                 value = getattr(botinfo, find)
-                dh.data_insert("configurations", [[find, value]])
+                dh.insert("configurations", [[find, value]])
                 return value
             else:
                 value = input("Enter " + find + ": ")
-                dh.data_insert("configurations", [[find, value]])
+                dh.insert("configurations", [[find, value]])
                 return value
         except Exception as e:
             self.logger.error(
@@ -129,7 +133,7 @@ class CommandLineInterface():
                 to_add[1],
                 to_add[2]))
         if input().lower() == "y":
-            dh.data_insert("message_responses", list(to_add))
+            dh.insert("message_responses", list(to_add))
         elif input().lower() == "r":
             self.response_add()
 
@@ -139,10 +143,19 @@ class CommandLineInterface():
             "Available tables are {}. \nEnter the table: ".format(tables))
         if table in tables:
             print("Retrieving {}".format(table))
-            retrieved = dh.data_fetch(table, "*")
+            retrieved = dh.fetch(table, "*")
             for i in range(len(retrieved)):
                 print(retrieved[i], "\n")
 
+    def cred_import(self):
+        try:
+            for cred in ["client_id", "client_secret", "username", "password", "user_agent"]:
+                value = getattr(botinfo, cred)
+                dh.insert("configurations", [[cred, value]])
+            dh.insert("configurations", [["remember", "true"]])
+            print("Successfully imported credentials")
+        except Exception as e:
+            self.logger.error("Error importing: {}".format(e))
 
 if __name__ == "__main__":
     C = CommandLineInterface()

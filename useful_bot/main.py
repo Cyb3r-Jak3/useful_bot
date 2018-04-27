@@ -6,7 +6,7 @@ import os
 import sys
 from sqlite3 import OperationalError
 # Internal
-import datahandler
+import datahandler as dh
 import logmaker
 import botinfo
 import downvote
@@ -22,28 +22,28 @@ def stopbot(delete=False):
 
 def getprevious():
     try:
-        comments = datahandler.data_fetch("Comments", "id")
+        comments = dh.fetch("Comments", "id")
     except Exception as e:
         logger.error("Error getting comment ids: " + str(e))
         stopbot()
     try:
-        posts = datahandler.data_fetch("Posts", "id")
+        posts = dh.fetch("Posts", "id")
     except Exception as e:
         logger.error("Error getting post ids: " + str(e))
         stopbot()
     try:
-        blacklist = datahandler.data_fetch("Blacklist", "user")
+        blacklist = dh.fetch("Blacklist", "user")
         blacklist.append("useful_bot")
     except Exception as e:
         logger.error("Error getting blacklisted users: " + str(e))
         stopbot()
     try:
-        mentions = datahandler.data_fetch("replied_mentions", "id")
+        mentions = dh.fetch("replied_mentions", "id")
     except Exception as e:
         logger.error("Error getting mentions: " + str(e))
         stopbot()
     try:
-        message_responses = datahandler.data_fetch("message_responses", "*")
+        message_responses = dh.fetch("message_responses", "*")
     except Exception as e:
         logger.error("Error getting message responses: " + str(e))
     return comments, posts, blacklist, mentions, message_responses
@@ -62,7 +62,7 @@ def start():
         return r
     except AttributeError as ae:
         try:
-            if datahandler.data_fetch("configurations", "remember") == "yes":
+            if dh.fetch("configurations", "remember") == "yes":
                 needed = [
                     "client_id",
                     "client_secret",
@@ -71,7 +71,7 @@ def start():
                     "user_agent"]
                 imports = []
                 for i in needed:
-                    imports.append(datahandler.data_fetch("configurations", i))
+                    imports.append(dh.fetch("configurations", i))
                 try:
                     r = praw.Reddit(
                         client_id=imports[0],
@@ -123,7 +123,7 @@ def post_reply(subreddit):
                 except Exception as e:
                     logger.warn(e)
 
-    datahandler.data_insert("Posts", toadd)
+    dh.insert("Posts", toadd)
     logger.info("Finished Posts")
 
 
@@ -153,14 +153,14 @@ def comment_reply(subreddit):
                 except Exception as e:
                     logger.warn(e)
 
-    datahandler.data_insert("Comments", toadd)
+    dh.insert("Comments", toadd)
     logger.info("Finished Comments")
 
 
-def reply_format(unformated, author):
-    if "{user}" in unformated:
-        unformated = unformated.format(user=author)
-    formatted = unformated + botinfo.footer
+def reply_format(unformatted, author):
+    if "{user}" in unformatted:
+        unformatted = unformatted.format(user=author)
+    formatted = unformatted + botinfo.footer
     return formatted
 
 
@@ -177,10 +177,10 @@ def message_check(additional):
                 '%Y-%m-%d %H:%M:%S'), x.body]]
             logger.info("Blacklisting user: " + x.author.name)
             message_send(x.author.name, "blacklist add")
-            datahandler.data_insert("Blacklist", data)
+            dh.insert("Blacklist", data)
             marked.append(x)
         elif (("resume" == received_subject) or ("unblacklist" == received_subject)) and name in blacklisted:
-            datahandler.data_delete(
+            dh.delete(
                 "Blacklist",
                 "user",
                 "\'{user}\'".format(
@@ -249,11 +249,11 @@ def find_mentions():
                 toadd.append(marked)
             except Exception as e:
                 logger.warn(e)
-    datahandler.data_insert("replied_mentions", toadd)
+    dh.insert("replied_mentions", toadd)
 
 
 if __name__ == "__main__":
-    datahandler.create()
+    dh.create()
     logger = logmaker.make_logger("Main")
     logger.info("Starting up")
     reddit = start()

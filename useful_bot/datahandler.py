@@ -42,7 +42,7 @@ reply_message text);"""]
         cursor.execute(i)
 
 
-def data_insert(table, data):
+def insert(table, data):
     logger = logmaker.make_logger("Data")
     if table == "Blacklist":
         for i in data:
@@ -91,7 +91,7 @@ def data_insert(table, data):
                 logger.error(e)
 
 
-def data_fetch(table, ident):
+def fetch(table, ident):
     cursor.execute(
         "SELECT {ident} FROM {table}".format(
             table=table, ident=ident))
@@ -105,7 +105,7 @@ def data_fetch(table, ident):
     return result
 
 
-def data_delete(table, choice, ident):
+def delete(table, choice, ident):
     command = (
         "DELETE FROM {table} WHERE {choice}={ident}".format(
             table=table,
