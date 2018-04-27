@@ -253,7 +253,7 @@ def find_mentions():
 
 
 if __name__ == "__main__":
-    datahandler.create()
+    dh.create()
     logger = logmaker.make_logger("Main")
     logger.info("Starting up")
     reddit = start()
