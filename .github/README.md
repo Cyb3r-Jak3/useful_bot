@@ -28,7 +28,7 @@ or
 python3 cli.py
 ```
 If you want to import the credentials for easier use
-``` python
+```
 python3.6 cli.py import
 ```
 ---
