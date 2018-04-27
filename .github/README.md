@@ -27,6 +27,10 @@ or
 ```
 python3 cli.py
 ```
+If you want to import the credentials for easier use
+``` python
+python3.6 cli.py import
+```
 ---
 #### Versions
 
@@ -53,14 +57,9 @@ Version 1 | April 5th, 2018 | [Link](https://github.com/coolaspie/useful_bot/rel
 ---
 
 #### Issues:
-* Have not seen proof the that downvote remover works
+* running either main.py or cli.py out of folder creates the db file there
 
 If you find one please submit it in the issues tab
 
 ---
-
-
-##### Future Release Plans
-###### These are subject to change without notice, but I will do my best to update this section.
-###### Bold number indicate a planned release 
-* 3.6 CLI import credentials 
+#### Possible Future Features
