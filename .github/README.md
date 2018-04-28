@@ -62,4 +62,5 @@ Version 1 | April 5th, 2018 | [Link](https://github.com/coolaspie/useful_bot/rel
 If you find one please submit it in the issues tab
 
 ---
-#### Possible Future Features
+#### Planned Future Releases
+* v4.0 - Fix the os error 
