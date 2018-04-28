@@ -234,7 +234,6 @@ def message_send(user, type):
     reddit.redditor(user).message(subject, message)
 
 
-
 def find_mentions():
     toadd = []
     for x in reddit.inbox.mentions():

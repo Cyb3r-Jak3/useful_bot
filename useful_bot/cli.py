@@ -149,13 +149,19 @@ class CommandLineInterface():
 
     def cred_import(self):
         try:
-            for cred in ["client_id", "client_secret", "username", "password", "user_agent"]:
+            for cred in [
+                "client_id",
+                "client_secret",
+                "username",
+                "password",
+                    "user_agent"]:
                 value = getattr(botinfo, cred)
                 dh.insert("configurations", [[cred, value]])
             dh.insert("configurations", [["remember", "true"]])
             print("Successfully imported credentials")
         except Exception as e:
             self.logger.error("Error importing: {}".format(e))
+
 
 if __name__ == "__main__":
     C = CommandLineInterface()
