@@ -57,10 +57,8 @@ Version 1 | April 5th, 2018 | [Link](https://github.com/coolaspie/useful_bot/rel
 ---
 
 #### Issues:
-* running either main.py or cli.py out of folder creates the db file there
 
 If you find one please submit it in the issues tab
 
 ---
 #### Planned Future Releases
-* v4.0 - Fix the os error 

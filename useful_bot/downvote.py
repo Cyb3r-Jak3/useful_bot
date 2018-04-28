@@ -12,7 +12,6 @@ def downvoted_remover(r):
     deleted = 0
 
     for comment in comments:
-        print(comment, comment.score)
         if comment.score <= -1:
             logger.info("Removing comment {}".format(comment.id))
             comment.delete()

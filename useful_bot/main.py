@@ -136,12 +136,12 @@ def comment_reply(subreddit):
         submission.comments.replace_more(
             limit=50)  # Gets 50 comments from each post
         for comment in submission.comments.list():
-            add = []
             text = comment.body
             author = comment.author.name
             if (botinfo.comment_text in text.lower()) and (
                     comment.id not in comments_replied_to) and (author.lower() not in blacklisted):
                 try:
+                    add = []
                     add.append(comment.id)
                     add.append(
                         datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
@@ -234,6 +234,7 @@ def message_send(user, type):
     reddit.redditor(user).message(subject, message)
 
 
+
 def find_mentions():
     toadd = []
     for x in reddit.inbox.mentions():
@@ -253,8 +254,8 @@ def find_mentions():
 
 
 if __name__ == "__main__":
-    dh.create()
     logger = logmaker.make_logger("Main")
+    dh.create()
     logger.info("Starting up")
     reddit = start()
     subreddit_choice = botinfo.subreddit
