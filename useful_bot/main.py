@@ -235,6 +235,7 @@ def message_send(user, type):
 
 
 def find_mentions():
+    logger.info("Starting Mentions")
     toadd = []
     for x in reddit.inbox.mentions():
         if str(x) not in mentions:
@@ -250,6 +251,7 @@ def find_mentions():
             except Exception as e:
                 logger.warn(e)
     dh.insert("replied_mentions", toadd)
+    logger.info("Finished mentions")
 
 
 if __name__ == "__main__":

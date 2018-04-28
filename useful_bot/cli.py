@@ -18,9 +18,12 @@ class CommandLineInterface():
         dh.create()
 
         # Start praw object using credentials in data base.
-        if sys.argv[1].lower() == "import":
-            self.cred_import()
-            return
+        try:
+            if sys.argv[1].lower() == "import":
+                self.cred_import()
+                return
+        except IndexError:
+            self.logger.debug("Did not set import")
         self.r = self.start_bot()
         self.run()
 
@@ -45,6 +48,7 @@ class CommandLineInterface():
         print()
         print("Extra:")
         print("response add")
+        print("response delete")
         print("table search")
         print()
         while True:
@@ -69,6 +73,8 @@ class CommandLineInterface():
                         downvote.downvoted_remover(main.reddit)
                     if "response add" in command:
                         self.response_add()
+                    if "response delete" in command:
+                        self.response_delete()
                     if "table search" in command:
                         self.search()
                     if command == "exit":
@@ -137,6 +143,21 @@ class CommandLineInterface():
         elif input().lower() == "r":
             self.response_add()
 
+    def response_delete(self):
+        retrieved = dh.fetch("message_responses", "*")
+        for i in range(len(retrieved)):
+            print(i+1, retrieved[i], "\n")
+        try:
+            choice = int(input("Enter the number of the response you wish to delete: "))
+            print("You have selected ", retrieved[choice - 1], "\n" + "Enter (y)es to delete: ")
+        except (ValueError, IndexError):
+            print("Enter a valid number")
+            self.run()
+        confirm = input().lower()
+        if confirm.startswith("y"):
+            dh.delete("message_responses", "keyword", "\'{keyword}\'".format(keyword=retrieved[choice-1][0]))
+            print("Deleted")
+
     def search(self):
         tables = dh.table_fetch()
         table = input(
@@ -144,8 +165,14 @@ class CommandLineInterface():
         if table in tables:
             print("Retrieving {}".format(table))
             retrieved = dh.fetch(table, "*")
-            for i in range(len(retrieved)):
-                print(retrieved[i], "\n")
+            if len(retrieved) == 0:
+                print("The table was empty")
+            else:
+                for i in range(len(retrieved)):
+                    print(retrieved[i], "\n")
+        else:
+            print("Enter a valid table")
+
 
     def cred_import(self):
         try:
