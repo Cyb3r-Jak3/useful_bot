@@ -37,6 +37,12 @@ value text);""", """
 CREATE TABLE IF NOT EXISTS message_responses (
 keyword text NOT NULL DEFAULT '',
 reply_subject text,
+reply_message text);""", """
+CREATE TABLE IF NOT EXISTS comment_responses (
+keyword text NOT NULL DEFAULT '',
+reply_message text);""", """
+CREATE TABLE IF NOT EXISTS post_responses (
+keyword text NOT NULL DEFAULT '',
 reply_message text);"""]
     for i in commands:
         cursor.execute(i)
@@ -44,6 +50,7 @@ reply_message text);"""]
 
 def insert(table, data):  # Creates new rows in the table
     logger = logmaker.make_logger("Data")
+    print(table)
     if table == "Blacklist":
         for i in data:
             format_str = """ INSERT OR IGNORE INTO {choice} (user, time, reason) VALUES (?, ?, ?)""".format(
@@ -80,6 +87,15 @@ def insert(table, data):  # Creates new rows in the table
                 connection.commit()
             except Exception as e:
                 logger.error(e)
+    elif (table == "post_responses") or (table == "comment_responses"):
+        for i in data:
+            format_str = """ INSERT OR IGNORE INTO {choice} (keyword, reply_message) VALUES (?, ?)""".format(
+                choice=table)
+            try:
+                cursor.execute(format_str, (i[0], i[1]))
+                connection.commit()
+            except Exception as e:
+                logger.error(e)
     else:
         for i in data:
             format_str = """ INSERT OR IGNORE INTO {choice} (id, time, subreddit, reply) VALUES (?, ?, ?, ?)""".format(
@@ -101,7 +117,8 @@ def fetch(table, ident):  # Gets the data from the database
     else:  # Stuff like post and comment ids only need the actual id which is the first value stored.
         result = []
         for i in range(len(fetched)):
-            result.append(fetched[i][0])  # Gets all the first values and makes them into a list
+            # Gets all the first values and makes them into a list
+            result.append(fetched[i][0])
     return result
 
 

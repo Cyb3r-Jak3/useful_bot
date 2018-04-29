@@ -13,10 +13,6 @@ footer = "  \n ---  \n ^(^beep ^boop ^I ^am ^a ^bot ^and ^this ^action ^was ^pre
          "[^^Blacklist](https://www.reddit.com/message/compose/?to=" + username + "&subject=Blacklist&message=Please+add+a+reason+here) ^^| [^^Contact ^^author]" \
     "(https://www.reddit.com/message/compose/?to=" + author + "&subject=Bot+issue&message=Please+add+a+reason+here)"
     # The footer looks like this because it matches reddit's markdown
-comment_text = "What you want the bot to find in the comments"
-comment_reply = "What you want the bot to comment when it finds the comment_text"
-post_text = "What you want the bot to find in the post"
-post_reply = "What you want the bot to comment when it finds the post_text"
 
 # Reply format support:
 #   {user} for author's name ie Hello {user} prints Hello (author of comment)

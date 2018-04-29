@@ -50,10 +50,11 @@ class CommandLineInterface:
         print("response add")
         print("response delete")
         print("table search")
+        print("change subreddit")
         print()
         while True:
-            command = input("> ")
-            main.comments_replied_to, main.posts_replied_to, main.blacklisted, main.mentions, main.additional_responses = main.getprevious()
+            command = input("> ").lower()
+            main.comments_replied_to, main.posts_replied_to, main.blacklisted, main.mentions, main.additional_responses, main.comment_responses, main.post_responses = main.getprevious()
             loop = True
             delay = 0
             if "-" in command:
@@ -77,6 +78,8 @@ class CommandLineInterface:
                         self.response_delete()
                     if "table search" in command:
                         self.search()
+                    if "change subreddit" in command:
+                        self.replace_subreddit()
                     if command == "exit":
                         main.stopbot(True)
                     if "-" not in command:
@@ -112,16 +115,9 @@ class CommandLineInterface:
             ids = dh.fetch("configurations", "id")
             return values[ids.index(find)]
         except ValueError as ve:  # The exception is called if there are no values in configurations table
-            choice = input(
-                "Enter I to import the credential {} from botinfo".format(find)).lower()
-            if choice == "i":
-                value = getattr(botinfo, find)
-                dh.insert("configurations", [[find, value]])
-                return value
-            else:  # Still the option for manual entry of values
-                value = input("Enter " + find + ": ")
-                dh.insert("configurations", [[find, value]])
-                return value
+            value = input("Enter " + find + ": ")
+            dh.insert("configurations", [[find, value]])
+            return value
         except Exception as e:
             self.logger.error(
                 "There was an error retrieving credentials: {} ".format(e))
@@ -129,34 +125,66 @@ class CommandLineInterface:
 
     def response_add(self):  # Creates additional responses for messages
         self.to_add = []
+        choice = input(
+            "What kind of response do you want to set; Comment, Post, or Message: ").lower()
+        if choice.startswith("c"):
+            table = "comment_responses"
+        elif choice.startswith("p"):
+            table = "post_responses"
+        elif choice.startswith("m"):
+            table = "message_responses"
+        else:
+            print("Exiting: no valid selection")
+            self.run()
         self.to_add.append(
-            input("Enter what the subject line you want to trigger a response: "))
-        self.to_add.append(input("Enter what you want the reply subject to be: "))
+            input("Enter what the keyword you want to trigger a response: "))
+        if table == "message_responses":
+            self.to_add.append(
+                input("Enter what you want the reply subject to be: "))
         self.to_add.append(input("Enter the message for the reply: "))
-        print(
-            "For the message response template, {0} is the trigger word/phrase. {1} is the response subject and {2} is the response body. \n"
-            " Enter Y to conform, R to redo or N to cancel." .format(
-                self.to_add[0],
-                self.to_add[1],
-                self.to_add[2]))
+        if table == "message_responses":
+            print(
+                "For the message response, \n' {0} ' is the trigger word/phrase. ' {1} ' is the response subject and ' {2} ' is the response body. \n"
+                "Enter Y to conform, R to redo or N to cancel." .format(
+                    self.to_add[0], self.to_add[1], self.to_add[2]))
+        else:
+            print(
+                "For the message response, \n' {0} ' is the trigger word/phrase. The response body is ' {1} ' \n"
+                "Enter Y to confirm, R to redo or N to cancel." .format(
+                    self.to_add[0], self.to_add[1]))
         if input().lower() == "y":
-            dh.insert("message_responses", list(self.to_add))
+            dh.insert(table, [self.to_add])
         elif input().lower() == "r":
             self.response_add()
 
     def response_delete(self):  # Deletes unwanted responses
-        retrieved = dh.fetch("message_responses", "*")
+        choice = input(
+            "Enter the response type you want to remove: Comment, Post, or Message\n").lower()
+        if choice.startswith("c"):
+            table = "comment_responses"
+        elif choice.startswith("p"):
+            table = "post_responses"
+        elif choice.startswith("m"):
+            table = "message_responses"
+        else:
+            print("No valid table selected")
+            self.run()
+        retrieved = dh.fetch(table, "*")
         for i in range(len(retrieved)):
-            print(i+1, retrieved[i], "\n")
+            print(i + 1, retrieved[i], "\n")
         try:
-            choice = int(input("Enter the number of the response you wish to delete: "))
-            print("You have selected ", retrieved[choice-1], "\n" + "Enter (y)es to delete: ")
+            choice = int(
+                input("Enter the number of the response you wish to delete: "))
+            print("You have selected ",
+                  retrieved[choice - 1],
+                  "\n" + "Enter (y)es to delete: ")
         except (ValueError, IndexError):
             print("Enter a valid number")
             self.run()
         confirm = input().lower()
         if confirm.startswith("y"):
-            dh.delete("message_responses", "keyword", "\'{keyword}\'".format(keyword=retrieved[choice-1][0]))
+            dh.delete("message_responses", "keyword",
+                      "\'{keyword}\'".format(keyword=retrieved[choice - 1][0]))
             print("Deleted")
 
     def search(self):  # Find all the data in a table.
@@ -182,12 +210,22 @@ class CommandLineInterface:
                 "username",
                 "password",
                     "user_agent"]:
-                value = getattr(botinfo, cred)
-                dh.insert("configurations", [[cred, value]])
+                try:
+                    value = getattr(botinfo, cred)
+                    dh.insert("configurations", [[cred, value]])
+                except ValueError:
+                    self.fetch_config(cred)
             dh.insert("configurations", [["remember", "true"]])
             print("Successfully imported credentials")
+
         except Exception as e:
             self.logger.error("Error importing: {}".format(e))
+
+    def replace_subreddit(self):
+        new = input("Enter the new subreddit: ")
+        dh.delete("configurations", "id", "\'subreddit\'")
+        dh.insert("configurations", [["subreddit", new]])
+        print("Subreddit changed to: {}".format(self.fetch_config("subreddit")))
 
 
 if __name__ == "__main__":

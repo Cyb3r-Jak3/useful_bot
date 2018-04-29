@@ -27,29 +27,41 @@ def getprevious():  # This just goes through and get all the data
     try:
         comments = dh.fetch("Comments", "id")
     except Exception as e:
-        logger.error("Error getting comment ids: " + str(e))
+        logger.error("Error getting comment ids: {}".format(e))
         stopbot()
     try:
         posts = dh.fetch("Posts", "id")
     except Exception as e:
-        logger.error("Error getting post ids: " + str(e))
+        logger.error("Error getting post ids: {}".format(e))
         stopbot()
     try:
         blacklist = dh.fetch("Blacklist", "user")
         blacklist.append("useful_bot")
     except Exception as e:
-        logger.error("Error getting blacklisted users: " + str(e))
+        logger.error("Error getting blacklisted users: ".format(e))
         stopbot()
     try:
         retrieved_mentions = dh.fetch("replied_mentions", "id")
     except Exception as e:
-        logger.error("Error getting mentions: " + str(e))
+        logger.error("Error getting mentions: ".format(e))
         stopbot()
     try:
         message_responses = dh.fetch("message_responses", "*")
     except Exception as e:
-        logger.error("Error getting message responses: " + str(e))
-    return comments, posts, blacklist, retrieved_mentions, message_responses  # If using Pycharm says references before assignment but the script will stop before that
+        logger.error("Error getting message responses: {}".format(e))
+        stopbot()
+    try:
+        comments_triggers = dh.fetch("comment_responses", "*")
+    except Exception as e:
+        logger.error("Error getting comment responses: {}".format(e))
+    try:
+        post_triggers = dh.fetch("post_responses", "*")
+    except Exception as e:
+        logger.error("Error getting post responses: {}".format(e))
+
+    # If using Pycharm says references before assignment but the script will
+    # stop before that
+    return comments, posts, blacklist, retrieved_mentions, message_responses, comments_triggers, post_triggers
 
 
 def start():  # Logging in
@@ -99,32 +111,34 @@ def start():  # Logging in
             stopbot()
 
 
-def post_reply(subreddit):  # Replies to posts that have the words in the title.
+# Replies to posts that have the words in the title.
+def post_reply(subreddit):
     logger.info("Starting Posts")
     toadd = []
     for submission in subreddit.hot(
             limit=10):  # Gets submissions from the subreddit. Here it has a limit of 10
         add = []
         if submission.id not in posts_replied_to:
-            if (re.search(botinfo.post_text, submission.title, re.IGNORECASE)) and (
-                    submission.author.name not in blacklisted):  # If you wanted to have it search the body change submission.title to sub,
-                try:
-                    add.append(submission.id)
-                    submission.reply(
-                        reply_format(
-                            botinfo.post_reply,
-                            submission.author))
-                    add.append(
-                        datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                    logger.debug(
-                        "Bot replying to : {0}".format(
-                            submission.title))
-                    add.append(botinfo.subreddit)
-                    add.append(botinfo.post_reply)
-                    toadd.append(add)
-                    break
-                except Exception as e:
-                    logger.warn(e)
+            for response in post_responses:
+                if (re.search(response[0], submission.title, re.IGNORECASE)) and (
+                        submission.author.name not in blacklisted):  # If you wanted to have it search the body change submission.title to sub,
+                    try:
+                        add.append(submission.id)
+                        submission.reply(
+                            reply_format(
+                                response[1],
+                                submission.author))
+                        add.append(
+                            datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                        logger.debug(
+                            "Bot replying to : {0}".format(
+                                submission.title))
+                        add.append(botinfo.subreddit)
+                        add.append(response[1])
+                        toadd.append(add)
+                        break
+                    except Exception as e:
+                        logger.warn(e)
 
     dh.insert("Posts", toadd)  # Adds all the posts that were replied to
     logger.info("Finished Posts")
@@ -141,20 +155,21 @@ def comment_reply(subreddit):  # Looks through all comments in a post
         for comment in submission.comments.list():
             text = comment.body
             author = comment.author.name
-            if (botinfo.comment_text in text.lower()) and (
-                    comment.id not in comments_replied_to) and (author.lower() not in blacklisted):
-                try:
-                    add = []
-                    add.append(comment.id)
-                    add.append(
-                        datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                    add.append(botinfo.comment_reply)
-                    add.append(botinfo.subreddit)
-                    comment.reply(reply_format(botinfo.comment_reply, author))
-                    logger.debug("Bot replying to {0}".format(text))
-                    toadd.append(add)
-                except Exception as e:
-                    logger.warn(e)
+            for response in comment_responses:
+                if (response[0] in text.lower()) and (
+                        comment.id not in comments_replied_to) and (author.lower() not in blacklisted):
+                    try:
+                        add = []
+                        add.append(comment.id)
+                        add.append(
+                            datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                        add.append(response[1])
+                        add.append(botinfo.subreddit)
+                        comment.reply(reply_format(response[1], author))
+                        logger.debug("Bot replying to {0}".format(text))
+                        toadd.append(add)
+                    except Exception as e:
+                        logger.warn(e)
 
     dh.insert("Comments", toadd)  # Gets all the comments that were replied to
     logger.info("Finished Comments")
@@ -202,7 +217,8 @@ def message_check(additional):  # Checks to see if there are messages
                 break
         if to_break:
             break
-        elif received_subject != "username mention":  # Username mentions appear in the inbox so this filters them out
+        # Username mentions appear in the inbox so this filters them out
+        elif received_subject != "username mention":
             logger.info(
                 "Message with subject and body not understood. Subject: {0}   Body: {1}".format(
                     x.subject, x.body))
@@ -229,7 +245,7 @@ def message_send(user, kind):  # Sends messages to users
     if kind == "additional":
         subject = additional_responses[additional_choice][1]
         message = additional_responses[additional_choice][2]
-    else:
+    if kind == "unknown":
         subject = "Message Unknown"
         message = "Hello {user},  \n" \
                   "This message is being sent to you because you have sent me a message that I am unsure how to deal with it. " \
@@ -242,7 +258,9 @@ def find_mentions():  # Finds anytime there is a username mention
     logger.info("Starting Mentions")
     toadd = []
     for x in reddit.inbox.mentions():
-        if str(x) not in mentions:  # Needs the mentions database because I was unable to mark them as read with praw
+        # Needs the mentions database because I was unable to mark them as read
+        # with praw
+        if str(x) not in mentions:
             try:
                 logger.debug(
                     "Found mention {id}. User {user} Body {body}".format(
@@ -265,7 +283,8 @@ if __name__ == "__main__":
     reddit = start()
     subreddit_choice = botinfo.subreddit
     subreddit = reddit.subreddit(botinfo.subreddit)
-    comments_replied_to, posts_replied_to, blacklisted, mentions, additional_responses = getprevious()  # Gets all the data from the database
+    # Gets all the data from the database
+    comments_replied_to, posts_replied_to, blacklisted, mentions, additional_responses, comment_responses, post_responses = getprevious()
     additional_choice = None
     message_check(additional_responses)
     post_reply(subreddit)
