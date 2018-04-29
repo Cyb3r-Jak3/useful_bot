@@ -1,3 +1,6 @@
+#
+# © Jacob White 2018 under MIT License
+#
 # External
 import praw
 import re
@@ -12,7 +15,7 @@ import botinfo
 import downvote
 
 
-def stopbot(delete=False):
+def stopbot(delete=False):  # Ends the script and deletes log files if no errors occurred
     logger.info("Shutting down")
     if delete:
         logger.info("Deleting log file")
@@ -20,7 +23,7 @@ def stopbot(delete=False):
     sys.exit(0)
 
 
-def getprevious():
+def getprevious():  # This just goes through and get all the data
     try:
         comments = dh.fetch("Comments", "id")
     except Exception as e:
@@ -38,7 +41,7 @@ def getprevious():
         logger.error("Error getting blacklisted users: " + str(e))
         stopbot()
     try:
-        mentions = dh.fetch("replied_mentions", "id")
+        retrieved_mentions = dh.fetch("replied_mentions", "id")
     except Exception as e:
         logger.error("Error getting mentions: " + str(e))
         stopbot()
@@ -46,10 +49,10 @@ def getprevious():
         message_responses = dh.fetch("message_responses", "*")
     except Exception as e:
         logger.error("Error getting message responses: " + str(e))
-    return comments, posts, blacklist, mentions, message_responses
+    return comments, posts, blacklist, retrieved_mentions, message_responses  # If using Pycharm says references before assignment but the script will stop before that
 
 
-def start():
+def start():  # Logging in
     try:
         r = praw.Reddit(
             client_id=botinfo.client_id,
@@ -60,8 +63,8 @@ def start():
         r.user.me()  # Verify log in, will raise exception if log in failed.
         logger.info("Successfully logged in")
         return r
-    except AttributeError as ae:
-        try:
+    except AttributeError as ae:  # AttributeError will occur if the values of botinfo do not exist
+        try:  # Attempts to import credentials from the configurations table
             if dh.fetch("configurations", "remember") == "yes":
                 needed = [
                     "client_id",
@@ -85,18 +88,18 @@ def start():
                     logger.error(
                         "Error when trying to import credentials: {}".format(e))
                     stopbot()
-        except OperationalError as oe:
+        except OperationalError as oe:  # OperationalError will occur when nothing exists in the table
             logger.error(
                 "There was an error trying to import the credentials. This either means that it was never setup"
                 " or there was actually an error.\nIf you want to to be able to import credentials then add them from the cli")
             stopbot()
-        except Exception as e:
+        except Exception as e:  # General Exception
             logger.error(
                 "There was an error when dealing with credentials: {}".format(e))
             stopbot()
 
 
-def post_reply(subreddit):
+def post_reply(subreddit):  # Replies to posts that have the words in the title.
     logger.info("Starting Posts")
     toadd = []
     for submission in subreddit.hot(
@@ -104,7 +107,7 @@ def post_reply(subreddit):
         add = []
         if submission.id not in posts_replied_to:
             if (re.search(botinfo.post_text, submission.title, re.IGNORECASE)) and (
-                    submission.author.name not in blacklisted):
+                    submission.author.name not in blacklisted):  # If you wanted to have it search the body change submission.title to sub,
                 try:
                     add.append(submission.id)
                     submission.reply(
@@ -123,11 +126,11 @@ def post_reply(subreddit):
                 except Exception as e:
                     logger.warn(e)
 
-    dh.insert("Posts", toadd)
+    dh.insert("Posts", toadd)  # Adds all the posts that were replied to
     logger.info("Finished Posts")
 
 
-def comment_reply(subreddit):
+def comment_reply(subreddit):  # Looks through all comments in a post
     logger.info("Starting Comments")
     toadd = []
     for post in subreddit.hot(
@@ -153,10 +156,11 @@ def comment_reply(subreddit):
                 except Exception as e:
                     logger.warn(e)
 
-    dh.insert("Comments", toadd)
+    dh.insert("Comments", toadd)  # Gets all the comments that were replied to
     logger.info("Finished Comments")
 
 
+# Adds the footer and formats author name if needed
 def reply_format(unformatted, author):
     if "{user}" in unformatted:
         unformatted = unformatted.format(user=author)
@@ -164,10 +168,10 @@ def reply_format(unformatted, author):
     return formatted
 
 
-def message_check(additional):
+def message_check(additional):  # Checks to see if there are messages
     logger.info("Starting Messages")
     marked = []
-    for x in reddit.inbox.unread():
+    for x in reddit.inbox.unread():  # Gets all unread messages
         to_break = False
         received_subject = x.subject.lower()
         name = x.author.name.lower()
@@ -188,7 +192,7 @@ def message_check(additional):
             logger.info("Unblacklisting " + x.author.name)
             message_send(x.author.name, "blacklist remove")
             marked.append(x)
-        for i in range(len(additional)):
+        for i in range(len(additional)):  # Looks
             if additional[i][0] == received_subject:
                 global additional_choice
                 additional_choice = i
@@ -198,7 +202,7 @@ def message_check(additional):
                 break
         if to_break:
             break
-        elif received_subject != "username mention":
+        elif received_subject != "username mention":  # Username mentions appear in the inbox so this filters them out
             logger.info(
                 "Message with subject and body not understood. Subject: {0}   Body: {1}".format(
                     x.subject, x.body))
@@ -208,37 +212,37 @@ def message_check(additional):
     logger.info("Finished Messages")
 
 
-def message_send(user, type):
-    logger.info("Sending {0} message to {1}".format(type, user))
-    if type == "blacklist add":
+def message_send(user, kind):  # Sends messages to users
+    logger.info("Sending {0} message to {1}".format(kind, user))
+    if kind == "blacklist add":
         subject = "Successfully blacklisted"
         message = "Hello {user},  \n" \
                   "  This is a message confirming that you have been added to /u/useful_bot's blacklist.  \n" \
                   " If you still receive replies for me please send me a message. ".format(
                       user=user)
-    if type == "blacklist remove":
+    if kind == "blacklist remove":
         subject = "Successfully removed from blacklist"
         message = "Hello {user},  \n " \
                   "This message is confirming that you have been removed from /u/useful_bot's blacklist.  \n " \
                   "If you feel that this message was a mistake or you would like to remain on the blacklist then " \
                   "reply stop".format(user=user)
-    if type == "unknown":
+    if kind == "additional":
+        subject = additional_responses[additional_choice][1]
+        message = additional_responses[additional_choice][2]
+    else:
         subject = "Message Unknown"
         message = "Hello {user},  \n" \
                   "This message is being sent to you because you have sent me a message that I am unsure how to deal with it. " \
                   " \nRest assure this has been recorded and a solution should be in progress. Thanks ".format(
                       user=user)
-    if type == "additional":
-        subject = additional_responses[additional_choice][1]
-        message = additional_responses[additional_choice][2]
     reddit.redditor(user).message(subject, message)
 
 
-def find_mentions():
+def find_mentions():  # Finds anytime there is a username mention
     logger.info("Starting Mentions")
     toadd = []
     for x in reddit.inbox.mentions():
-        if str(x) not in mentions:
+        if str(x) not in mentions:  # Needs the mentions database because I was unable to mark them as read with praw
             try:
                 logger.debug(
                     "Found mention {id}. User {user} Body {body}".format(
@@ -261,7 +265,7 @@ if __name__ == "__main__":
     reddit = start()
     subreddit_choice = botinfo.subreddit
     subreddit = reddit.subreddit(botinfo.subreddit)
-    comments_replied_to, posts_replied_to, blacklisted, mentions, additional_responses = getprevious()
+    comments_replied_to, posts_replied_to, blacklisted, mentions, additional_responses = getprevious()  # Gets all the data from the database
     additional_choice = None
     message_check(additional_responses)
     post_reply(subreddit)

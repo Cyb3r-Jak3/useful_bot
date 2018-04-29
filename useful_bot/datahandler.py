@@ -7,7 +7,7 @@ connection = sqlite3.connect("data.db")
 cursor = connection.cursor()
 
 
-def create():
+def create():  # Safe to run this every time because it only creates tables if they are not present
     commands = ["""
 CREATE TABLE IF NOT EXISTS Posts (
 id text NOT NULL DEFAULT '',
@@ -42,7 +42,7 @@ reply_message text);"""]
         cursor.execute(i)
 
 
-def insert(table, data):
+def insert(table, data):  # Creates new rows in the table
     logger = logmaker.make_logger("Data")
     if table == "Blacklist":
         for i in data:
@@ -91,21 +91,21 @@ def insert(table, data):
                 logger.error(e)
 
 
-def fetch(table, ident):
+def fetch(table, ident):  # Gets the data from the database
     cursor.execute(
         "SELECT {ident} FROM {table}".format(
             table=table, ident=ident))
     fetched = cursor.fetchall()
-    if ident == "*":
+    if ident == "*":  # This means that you want all the information from the table
         result = fetched
-    else:
+    else:  # Stuff like post and comment ids only need the actual id which is the first value stored.
         result = []
         for i in range(len(fetched)):
-            result.append(fetched[i][0])
+            result.append(fetched[i][0])  # Gets all the first values and makes them into a list
     return result
 
 
-def delete(table, choice, ident):
+def delete(table, choice, ident):  # Deletes an entire row of data
     command = (
         "DELETE FROM {table} WHERE {choice}={ident}".format(
             table=table,
@@ -115,7 +115,7 @@ def delete(table, choice, ident):
     connection.commit()
 
 
-def table_fetch():
+def table_fetch():  # This just gets all the tables in the database
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     tables = cursor.fetchall()
     result = []

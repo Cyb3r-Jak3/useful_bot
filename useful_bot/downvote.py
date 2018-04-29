@@ -6,7 +6,7 @@ import botinfo
 def downvoted_remover(r):
     logger = logmaker.make_logger("Comment Remover")
     logger.info("Starting Downvoted Removal")
-
+    # Gets comments that are most likely to be downvoted
     comments = r.redditor(botinfo.username).comments.controversial(limit=1000)
 
     deleted = 0

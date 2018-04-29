@@ -10,24 +10,24 @@ import botinfo
 import downvote
 
 
-class CommandLineInterface():
+class CommandLineInterface:
     def __init__(self):
         self.logger = logmaker.make_logger("CLI")
         self.logger.debug("Starting CLI")
         # Connect to db.
         dh.create()
-
-        # Start praw object using credentials in data base.
+        # Imports the credentials
         try:
             if sys.argv[1].lower() == "import":
                 self.cred_import()
                 return
         except IndexError:
             self.logger.debug("Did not set import")
+        # Start praw object using credentials in data base.
         self.r = self.start_bot()
         self.run()
 
-    def run(self):
+    def run(self):  # Main menu
         try:
             main.subreddit_choice = self.fetch_config("subreddit")
         except Exception:
@@ -86,7 +86,7 @@ class CommandLineInterface():
                     print()
                     loop = False
 
-    def start_bot(self):
+    def start_bot(self):  # Completes the same process as in main.py just uses creds from configurations table
         try:
             client_id = self.fetch_config('client_id')
             client_secret = self.fetch_config('client_secret')
@@ -106,50 +106,51 @@ class CommandLineInterface():
             self.logger.error("Exception {} occurred on login".format(e))
             main.stopbot(False)
 
-    def fetch_config(self, find):
+    def fetch_config(self, find):  # Fetches the values needed to run the bot
         try:
             values = dh.fetch("configurations", "value")
             ids = dh.fetch("configurations", "id")
             return values[ids.index(find)]
-        except ValueError as ve:
+        except ValueError as ve:  # The exception is called if there are no values in configurations table
             choice = input(
                 "Enter I to import the credential {} from botinfo".format(find)).lower()
             if choice == "i":
                 value = getattr(botinfo, find)
                 dh.insert("configurations", [[find, value]])
                 return value
-            else:
+            else:  # Still the option for manual entry of values
                 value = input("Enter " + find + ": ")
                 dh.insert("configurations", [[find, value]])
                 return value
         except Exception as e:
             self.logger.error(
                 "There was an error retrieving credentials: {} ".format(e))
+            main.stopbot()
 
-    def response_add(self):
-        to_add = []
-        to_add.append(
+    def response_add(self):  # Creates additional responses for messages
+        self.to_add = []
+        self.to_add.append(
             input("Enter what the subject line you want to trigger a response: "))
-        to_add.append(input("Enter what you want the reply subject to be: "))
-        to_add.append(input("Enter the message for the reply: "))
+        self.to_add.append(input("Enter what you want the reply subject to be: "))
+        self.to_add.append(input("Enter the message for the reply: "))
         print(
             "For the message response template, {0} is the trigger word/phrase. {1} is the response subject and {2} is the response body. \n"
             " Enter Y to conform, R to redo or N to cancel." .format(
-                to_add[0],
-                to_add[1],
-                to_add[2]))
+                self.to_add[0],
+                self.to_add[1],
+                self.to_add[2]))
         if input().lower() == "y":
-            dh.insert("message_responses", list(to_add))
+            dh.insert("message_responses", list(self.to_add))
         elif input().lower() == "r":
             self.response_add()
 
-    def response_delete(self):
+    def response_delete(self):  # Deletes unwanted responses
         retrieved = dh.fetch("message_responses", "*")
         for i in range(len(retrieved)):
             print(i+1, retrieved[i], "\n")
         try:
             choice = int(input("Enter the number of the response you wish to delete: "))
-            print("You have selected ", retrieved[choice - 1], "\n" + "Enter (y)es to delete: ")
+            print("You have selected ", retrieved[choice-1], "\n" + "Enter (y)es to delete: ")
         except (ValueError, IndexError):
             print("Enter a valid number")
             self.run()
@@ -158,7 +159,7 @@ class CommandLineInterface():
             dh.delete("message_responses", "keyword", "\'{keyword}\'".format(keyword=retrieved[choice-1][0]))
             print("Deleted")
 
-    def search(self):
+    def search(self):  # Find all the data in a table.
         tables = dh.table_fetch()
         table = input(
             "Available tables are {}. \nEnter the table: ".format(tables))
@@ -173,8 +174,7 @@ class CommandLineInterface():
         else:
             print("Enter a valid table")
 
-
-    def cred_import(self):
+    def cred_import(self):  # Imports credentials from the botinfo
         try:
             for cred in [
                 "client_id",

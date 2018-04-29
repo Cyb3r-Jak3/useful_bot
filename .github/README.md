@@ -1,13 +1,14 @@
 # Useful bot
-## coolaspie
+## Jacob White aka coolaspie
+
+##### There are no more releases planned.
+###### I might work on it sporadically  
 
 #### Tested in python 3, 3.5, 3.6
 ---
-A reddit bot in python, using praw.  
+A reddit bot template in python, using praw.  
 
-End goal of this project is to have an easy to use reddit bot template for anyone who wants one.
-
-----------------------------------------------------------------------
+---------
 
 
 ### To use:
@@ -27,10 +28,12 @@ or
 ```
 python3 cli.py
 ```
-If you want to import the credentials for easier use
+If you want to import the credentials for easier use:
 ```
 python3.6 cli.py import
 ```
+This currently only works if the credentials are in the botinfo.py 
+
 ---
 #### Versions
 
@@ -51,8 +54,9 @@ Version 1 | April 5th, 2018 | [Link](https://github.com/coolaspie/useful_bot/rel
 * Be able to blacklist subreddits if contacted
   * Can request unblacklisting
 *  Respond to username mentions
-* Additional Responses to messages
-* Templete for simlple features
+* Create additional responses to messages
+    * Deleted created responses
+* Templete for simple features
 
 ---
 
@@ -61,4 +65,6 @@ Version 1 | April 5th, 2018 | [Link](https://github.com/coolaspie/useful_bot/rel
 If you find one please submit it in the issues tab
 
 ---
-#### Planned Future Releases
+#### Features that would be nice
+* Ability to have multiple comment/posts trigger words and responses
+* CLI manual import with the import arguement
