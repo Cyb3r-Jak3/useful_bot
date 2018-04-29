@@ -12,8 +12,8 @@ A reddit bot template in python, using praw.
 
 
 ### To use:
-You need to have your own api credentials. If you do not head [here](https://www.reddit.com/prefs/apps "reddit apps") and click create application -> script.
-Currently recommended that you enter the credtinals in botinfo.example.py and rename the file to. It is the recommended approach because you can run the cli and import the credtinals from the botinfo file but you can not currently run the main.py off the database credtinals.
+You need to have your own api credentials. If you do not head [here](https://www.reddit.com/prefs/apps "reddit apps") and click create application -> script.  
+Currently recommended that you enter the credtinals in botinfo.example.py and rename the file to. It is recommended because you can run the cli and import the credtinals from the botinfo file but you can run the main.py off the database credentials.  
 Fully tested releases are [here](https://github.com/coolaspie/useful_bot/releases "useful bot releases")   
 ``` 
 pip install praw  
@@ -40,6 +40,7 @@ This currently only works if the credentials are in the botinfo.py
 
 Number | Date | Download Link
 ---|---|---
+Version 4.0 | April 28th, 2018 | [Link](https://github.com/coolaspie/useful_bot/releases/download/v4.0/useful_bot.zip)
 Version 3.5 | April 21th, 2018 | [Link](https://github.com/coolaspie/useful_bot/releases/download/v3.4/useful_bot-master.zip)
 Version 3 | April 15th, 2018 | [Link](https://github.com/coolaspie/useful_bot/releases/download/V3/useful_bot-master.zip)
 Version 2 | April 13th, 2018 | [Link](https://github.com/coolaspie/useful_bot/releases/download/v2.0/useful_bot.zip)
