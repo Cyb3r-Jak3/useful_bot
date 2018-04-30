@@ -13,7 +13,8 @@ A reddit bot template in python, using praw.
 
 ### To use:
 You need to have your own api credentials. If you do not head [here](https://www.reddit.com/prefs/apps "reddit apps") and click create application -> script.  
-Currently recommended that you enter the credtinals in botinfo.example.py and rename the file to. It is recommended because you can run the cli and import the credtinals from the botinfo file but you can run the main.py off the database credentials.  
+**Add what is needed to botinfo.example.py then rename it to botinfo.py. If you do not fill all the info in then the script will not work.**  
+Currently recommended that you enter the credentials in database via the cli. However it is good to start with the credentials in the botinfo.py because the cli will import them for you   
 Fully tested releases are [here](https://github.com/coolaspie/useful_bot/releases "useful bot releases")   
 
 ``` 
@@ -34,7 +35,7 @@ If you want to import the credentials for easier use:
 python3.6 cli.py import
 ```
 **To get any responses to messages, posts or comments you have to use the response add feature in the cli.**  
-To get mutliple subreddit use the cli change subreddit and for the new subreddit do "subreddit1+subreddit2+etc
+To get mutliple subreddit use the cli change subreddit and for the new subreddit do "subreddit1+subreddit2+etc"
 
 ---
 #### Versions
@@ -52,17 +53,15 @@ Version 1 | April 5th, 2018 | [Link](https://github.com/coolaspie/useful_bot/rel
 #### Currently:
 * Replies to posts
 * Replies to comments
-* Reads messages and adds users who request blacklist or remove from blacklist
+* Reads messages and adds users who request blacklist or  unblacklisting 
 * Replies to messages
-* Be able to blacklist subreddits if contacted
-  * Can request unblacklisting
-*  Respond to username mentions
+* Respond to username mentions
 * Create additional responses to messages
     * Delete created responses
 * Templete for simple features
 * CLI manual import with the import arguement
 * Ability to have multiple comment/posts trigger words and responses
-* Post and Command Responses all in a table
+* Post and Command Responses all in a tables
 
 
 ---
