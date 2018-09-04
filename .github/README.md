@@ -1,5 +1,5 @@
 # Useful bot
-## Jacob White aka coolaspie
+## Jacob White
 
 ##### There are no more releases planned.
 ###### I might work on it sporadically  

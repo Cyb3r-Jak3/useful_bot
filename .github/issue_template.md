@@ -1,4 +1,4 @@
-### Except Behavior
+### Excepted Behavior
 
 
 ### Actual Behavior
