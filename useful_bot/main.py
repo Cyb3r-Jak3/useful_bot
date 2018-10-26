@@ -117,28 +117,28 @@ def post_reply(subreddit):
     toadd = []
     for submission in subreddit.hot(
             limit=10):  # Gets submissions from the subreddit. Here it has a limit of 10
-        add = []
         if submission.id not in posts_replied_to:
             for response in post_responses:
                 if (re.search(response[0], submission.title, re.IGNORECASE)) and (
                         submission.author.name not in blacklisted):  # If you wanted to have it search the body change submission.title to sub,
+                    add = []
+                    add.append(submission.id)
+                    add.append(botinfo.subreddit)
+                    add.append(response[1])
+                    add.append(
+                        datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                    logger.debug(
+                        "Bot replying to : {0}".format(
+                            submission.title))
                     try:
-                        add.append(submission.id)
                         submission.reply(
                             reply_format(
                                 response[1],
                                 submission.author))
-                        add.append(
-                            datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                        logger.debug(
-                            "Bot replying to : {0}".format(
-                                submission.title))
-                        add.append(botinfo.subreddit)
-                        add.append(response[1])
-                        toadd.append(add)
-                        break
                     except Exception as e:
                         logger.warn(e)
+                        print(toadd)
+                    toadd.append(add)
 
     dh.insert("Posts", toadd)  # Adds all the posts that were replied to
     logger.info("Finished Posts")
@@ -158,18 +158,19 @@ def comment_reply(subreddit):  # Looks through all comments in a post
             for response in comment_responses:
                 if (response[0] in text.lower()) and (
                         comment.id not in comments_replied_to) and (author.lower() not in blacklisted):
+                    add = []
+                    add.append(comment.id)
+                    add.append(
+                        datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                    add.append(response[1])
+                    add.append(botinfo.subreddit)
                     try:
-                        add = []
-                        add.append(comment.id)
-                        add.append(
-                            datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                        add.append(response[1])
-                        add.append(botinfo.subreddit)
                         comment.reply(reply_format(response[1], author))
                         logger.debug("Bot replying to {0}".format(text))
                         toadd.append(add)
                     except Exception as e:
                         logger.warn(e)
+                        print(toadd)
 
     dh.insert("Comments", toadd)  # Gets all the comments that were replied to
     logger.info("Finished Comments")
@@ -207,7 +208,7 @@ def message_check(additional):  # Checks to see if there are messages
             logger.info("Unblacklisting " + x.author.name)
             message_send(x.author.name, "blacklist remove")
             marked.append(x)
-        for i in range(len(additional)):  # Looks
+        for i in range(len(additional)):  # Looks for additional trigger words
             if additional[i][0] == received_subject:
                 global additional_choice
                 additional_choice = i
@@ -276,6 +277,15 @@ def find_mentions():  # Finds anytime there is a username mention
     logger.info("Finished mentions")
 
 
+def mod_invite():
+    try:
+        subreddit.mod.accept_invite()
+    except Exception as e:
+        logger.warn(e)
+    logger.info("Accepted invitation to subreddit: "+ str(subreddit))
+
+
+
 if __name__ == "__main__":
     logger = logmaker.make_logger("Main")
     dh.create()
@@ -291,4 +301,5 @@ if __name__ == "__main__":
     comment_reply(subreddit)
     find_mentions()
     downvote.downvoted_remover(reddit)
+    mod_invite()
     stopbot(True)

@@ -50,7 +50,7 @@ reply_message text);"""]
 
 def insert(table, data):  # Creates new rows in the table
     logger = logmaker.make_logger("Data")
-    print(table)
+#    print(table)
     if table == "Blacklist":
         for i in data:
             format_str = """ INSERT OR IGNORE INTO {choice} (user, time, reason) VALUES (?, ?, ?)""".format(
