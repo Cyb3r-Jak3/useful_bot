@@ -117,24 +117,21 @@ def post_reply(subreddit):
     toadd = []
     for submission in subreddit.hot(
             limit=10):  # Gets submissions from the subreddit. Here it has a limit of 10
-        add = []
         if submission.id not in posts_replied_to:
             for response in post_responses:
                 if (re.search(response[0], submission.title, re.IGNORECASE)) and (
                         submission.author.name not in blacklisted):  # If you wanted to have it search the body change submission.title to sub,
                     try:
-                        add.append(submission.id)
                         submission.reply(
                             reply_format(
                                 response[1],
                                 submission.author))
                         add.append(
-                            datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                            )
                         logger.debug(
                             "Bot replying to : {0}".format(
                                 submission.title))
-                        add.append(botinfo.subreddit)
-                        add.append(response[1])
+                        add = [submission.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), botinfo.subreddit, response[1]]
                         toadd.append(add)
                         break
                     except Exception as e:
@@ -159,12 +156,7 @@ def comment_reply(subreddit):  # Looks through all comments in a post
                 if (response[0] in text.lower()) and (
                         comment.id not in comments_replied_to) and (author.lower() not in blacklisted):
                     try:
-                        add = []
-                        add.append(comment.id)
-                        add.append(
-                            datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                        add.append(response[1])
-                        add.append(botinfo.subreddit)
+                        add = [comment.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), response[1], botinfo.subreddit]
                         comment.reply(reply_format(response[1], author))
                         logger.debug("Bot replying to {0}".format(text))
                         toadd.append(add)
@@ -263,7 +255,7 @@ def find_mentions():  # Finds anytime there is a username mention
         if str(x) not in mentions:
             try:
                 logger.debug(
-                    "Found mention {id}. User {user} Body {body}".format(
+                    "Found mention {id}, User: {user}, Body: {body}".format(
                         id=x, user=x.author, body=x.body))
                 x.reply("Hello, I see you mentioned me. How can I help?")
                 logger.debug("Replying to {}".format(x))
