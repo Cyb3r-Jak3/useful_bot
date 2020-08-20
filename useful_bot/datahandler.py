@@ -122,7 +122,9 @@ def fetch(table: str, column: str) -> [list]:  # Gets the data from the database
     -------
         Returns a list of the contents
     """
-    cursor.execute("SELECT {ident} FROM {table}".format(table=table, ident=column))  # nosec
+    cursor.execute(  # nosec
+        "SELECT {ident} FROM {table}".format(table=table, ident=column)
+    )
     fetched = cursor.fetchall()
     # This means that you want all the information from the table
     if column == "*":
