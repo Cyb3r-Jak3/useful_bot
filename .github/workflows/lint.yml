@@ -21,8 +21,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip install -U pip --quiet
-        pip install black flake8 bandit pylint -r requirements.txt --quiet
+        pip install -U pip
+        pip install black flake8 bandit pylint -r requirements.txt
     - name: Pylint
       run: pylint useful_bot
     - name: Flake8
