@@ -3,7 +3,7 @@
 import logging
 
 # Internal
-import botinfo
+import botinfo  # pylint: disable=import-error
 
 
 def make_logger(name: str) -> logging.Logger:

@@ -1,7 +1,7 @@
 """Functions that removes negative comments"""
 # Internal
 import logmaker
-import botinfo
+import botinfo  # pylint: disable=import-error
 
 logger = logmaker.make_logger("Comment Remover")
 

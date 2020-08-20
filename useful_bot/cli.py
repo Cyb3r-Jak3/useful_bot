@@ -8,7 +8,7 @@ import praw
 import datahandler as dh
 import logmaker
 import main
-import botinfo
+import botinfo  # pylint: disable=import-error
 import downvote
 
 
