@@ -148,9 +148,9 @@ def delete(table: str, choice: str, ident: str) -> None:
     ident: str
         The value that will in choice to indicate the row to delete
     """
-    command = "DELETE FROM {table} WHERE {choice}={ident}".format(
+    command = "DELETE FROM {table} WHERE {choice}={ident}".format(  # nosec
         table=table, choice=choice, ident=ident
-    )  # nosec
+    )
     cursor.execute(command)
     connection.commit()
 
