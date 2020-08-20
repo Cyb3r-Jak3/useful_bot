@@ -1,0 +1,33 @@
+name: Python Lint
+
+on:
+  push:
+  schedule:
+  - cron: "0 2 * * 0"
+
+jobs:
+  Lint:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install -U pip
+        pip install black flake8 bandit pylint -r requirements.txt
+    - name: Pylint
+      run: pylint useful_bot
+    - name: Flake8
+      run: flake8 useful_bot
+    - name: Bandit
+      run: bandit -r --skip B322 useful_bot
+    - name: Black
+      run: black --check useful_bot
