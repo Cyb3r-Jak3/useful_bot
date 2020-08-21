@@ -1,10 +1,7 @@
-# Useful bot
+Useful bot
 ---
 
-##### There are no more releases planned.
-
-###### I might work on it sporadically  
-
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![No Maintenance Intended](https://unmaintained.tech/badge.svg)](https://unmaintained.tech/)
 #### Tested in python 3.6, 3.7, 3.8
 
 ---
