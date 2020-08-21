@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "Cyb3r-Jak3"
+    commit-message:
+      prefix: "Pip Update"
+    reviewers:
+      - "Cyb3r-Jak3"
