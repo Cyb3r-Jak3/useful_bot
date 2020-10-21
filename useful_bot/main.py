@@ -18,7 +18,9 @@ import downvote
 
 
 # Ends the script and deletes log files if no errors occurred
-def stop_bot(delete=False,) -> None:
+def stop_bot(
+    delete=False,
+) -> None:
     """
     Function that exits the bot
     Parameters
