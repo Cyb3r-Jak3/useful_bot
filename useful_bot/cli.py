@@ -31,7 +31,7 @@ def search() -> None:
 
 
 class CommandLineInterface:
-    """"
+    """ "
     Class that handles the command line interactions
     """
 
@@ -125,7 +125,9 @@ class CommandLineInterface:
                     print()
                     loop = False
 
-    def setup_praw(self,) -> praw.Reddit:
+    def setup_praw(
+        self,
+    ) -> praw.Reddit:
         """
         Completed the same process as in the main.py file just
         auto uses credentials from the configuration table
