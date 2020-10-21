@@ -7,14 +7,19 @@ on:
 
 jobs:
   Lint:
-
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
-
+        python-version: [3.6, 3.7, 3.8, 3.9]
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txts') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -22,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -U pip
-        pip install black flake8 bandit pylint -r requirements.txt
+        pip install -r requirements-dev.txt
     - name: Pylint
       run: pylint useful_bot
     - name: Flake8
