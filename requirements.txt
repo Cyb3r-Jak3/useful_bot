@@ -1,2 +1,2 @@
-praw==7.7.0
+praw==7.7.1
 prawcore==2.3.0
